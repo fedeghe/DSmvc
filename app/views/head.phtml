@@ -1,0 +1,35 @@
+<meta charset="UTF-8">
+<title>[$title$]</title>
+<link rel="stylesheet" href="[D[URL_BASE]D]css/style.css" />
+<script src="[D[URL_BASE]D]js/jquery-1.4.2.min.js"></script>
+<script src="[D[URL_BASE]D]js/3dEngine.js"></script>
+<script src="[D[URL_BASE]D]js/objs/sphere.js"></script>
+<script>
+	jQuery(
+		function() {
+			var camera = new Camera3D();
+			camera.init(0,0,0,200);
+
+			var item = new Object3D($("#item"));
+
+			item.addChild(new Sphere(150));
+
+			var scene = new Scene3D();
+			scene.addToScene(item);
+
+
+			var animateIt = function(){
+				axisRotation.y += .01
+				axisRotation.x += .002
+				axisRotation.z += .02
+
+				scene.renderCamera(camera);
+			};
+
+			setInterval(animateIt, 20);
+
+			jQuery('li').fadeIn();
+		}
+	);
+
+</script>

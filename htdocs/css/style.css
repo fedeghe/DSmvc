@@ -1,0 +1,22 @@
+#item{
+	width:400px;
+	height:400px;
+	margin:0 auto;
+	top:300px;
+	position: relative;
+	/*border:1px solid white;*/
+}
+ul{
+	list-style-type: none;
+}
+body{
+	background-color: #111;
+	color: #1c1;
+	font-family: Arial, "MS Trebuchet", sans-serif;
+	font-weight: bold;
+	font-size:1em;
+}
+li{
+	text-align:center;
+	display:none;
+}
