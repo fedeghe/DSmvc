@@ -5,8 +5,10 @@ class welcome extends Controller{
 	public function action_index(){
 
 		$x = new View('head');
+
+		$Person = new Person('Federico', 'Ghedina');
 		
-		$x->title="DSmvc";
+		$x->title = "DSmvc ~ " . $Person->sayHello();
 
 		$v = new View('default');
 		

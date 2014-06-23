@@ -20,8 +20,6 @@
  *	{{}}		chunks
  *	[[]]		snippet
  *	[[]]		snippet
- *	{sJ{}Js}
- *	{sC{}Cs}
  *	{J{}J}
  *	{C{}JC}
  *	[T[]T]		translation
