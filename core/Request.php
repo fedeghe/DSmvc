@@ -6,11 +6,12 @@ class Request{
 
 	private function __construct(){}
 	
-	public static function handle($controller, $method, $arg = NULL){
+	public static function handle($controller, $action, $arg = NULL){
 
 		//echo $controller;
 		
 		//print_r($arg);
+		
 		
 		$params = array();
 			
@@ -38,8 +39,8 @@ class Request{
 			self::$_controllerInstance[$controller]->_add_vars($params,true);
 		}
 		
-		//method existance is managed by controller protected __call
-		self::$_controllerInstance[$controller]->$method($params);
+		//action existance is managed by controller protected __call
+		self::$_controllerInstance[$controller]->$action($params);
 
 		self::$_controllerInstance[$controller]->after();
 		return true;
