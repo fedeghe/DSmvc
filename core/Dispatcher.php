@@ -8,26 +8,38 @@ class Dispatcher{
 		!ONLINE && array_shift($url);
 
 		// get controller name
-		$controller = !empty($url[0]) ? $url[0]  : 'welcome';
+		$controller = !empty($url[0]) ? $url[0]  : DEFAULT_CONTROLLER;
 
-		// get method name of controller
-		$method = 'action_' . (!empty($url[1]) ? $url[1] : 'index');
+		// get action name of controller
+		$action = 'action_' . (!empty($url[1]) ? $url[1] : DEFAULT_ACTION);
 
-		// get argument passed in to the method
+		//echo $controller;
+
+		// get argument passed in to the action
 		array_shift($url);
 		array_shift($url);
 
 		$arg = $url;
 
-		// create controller instance and call the specified method
-		class_exists($controller) OR die("Controller `$controller.php` NOT FOUND");
+		// create controller instance and call the specified action
+		try {
+
+			class_exists($controller);
+			
+		}catch(Exception $e) {
+			if (defined('CONTROLLER404')) {
+				$controller = CONTROLLER404;
+				$action = 'action_index';
+			} else {
+				die("Controller `$controller.php` not found");
+			}
+		}
 		/*
 		debug(array(
 			$controller,
-			$method
+			$action
 		));
-*/
-		//die();
-		Request::handle($controller, $method, $arg);
+		*/
+		Request::handle($controller, $action, $arg);
     }
 }// End Dispatcher class

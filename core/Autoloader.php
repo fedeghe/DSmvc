@@ -8,13 +8,13 @@ include(PATH_CONFIG.'set_include_path.php');
 // define custom ClassNotFoundException exception class
 class ClassNotFoundException extends Exception{}
 
-
 class Autoloader {
 	public static function load($classname) {
-		require $classname.'.php';
+		
+        include $classname.'.php';
+        
 		if (!class_exists($classname, FALSE)){
-			//eval('class ' . $classname  . '{}');
-			throw new ClassNotFoundException('Class ' . $classname . ' not found.');
+			throw new ClassNotFoundException('Class ' . $classname . ' NOT found.');
 		}
 		unset($classname);
 	}
@@ -29,3 +29,7 @@ spl_autoload_extensions('.php');
 spl_autoload_register(array('Autoloader', 'load'));
 
 error_reporting(8191);
+
+
+
+
