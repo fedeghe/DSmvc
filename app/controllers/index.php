@@ -2,8 +2,8 @@
 
 class index extends Controller{
 
-    public function action_index(){
-
+    public function action_index($params){
+        
         $x = new View('head');
 
         $Person = new Person('Federico', 'Ghedina');

@@ -1,25 +1,31 @@
 <?php
 class Dispatcher{
-	
+
 	public static function dispatch(){
 
-		$url = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-		
+		$parse = parse_url($_SERVER['REQUEST_URI']);
+
+		$url = explode('/', trim($parse['path'], '/'));
+
 		!ONLINE && array_shift($url);
 
-		// get controller name
-		$controller = !empty($url[0]) ? $url[0]  : DEFAULT_CONTROLLER;
+		// get controller name		
+		if (!empty($url[0])){
+			$controller = $url[0];
+			array_shift($url);
+		
+			if (!empty($url[0])){
+				$action = $url[0];
+				array_shift($url);
+			}
+
+		} else {
+			$controller = DEFAULT_CONTROLLER;
+			$action = DEFAULT_ACTION;
+		}
 
 		// get action name of controller
-		$action = 'action_' . (!empty($url[1]) ? $url[1] : DEFAULT_ACTION);
-
-		//echo $controller;
-
-		// get argument passed in to the action
-		array_shift($url);
-		array_shift($url);
-
-		$arg = $url;
+		$action = 'action_' . $action;
 
 		// create controller instance and call the specified action
 		try {
@@ -40,6 +46,6 @@ class Dispatcher{
 			$action
 		));
 		*/
-		Request::handle($controller, $action, $arg);
+		Request::handle($controller, $action, $url);
     }
 }// End Dispatcher class
