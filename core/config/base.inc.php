@@ -14,8 +14,6 @@ defined('US') || define('US', '/');
 defined('DEFAULT_CONTROLLER') || define('DEFAULT_CONTROLLER', 'index');
 defined('DEFAULT_ACTION') || define('DEFAULT_ACTION', 'index');
 defined('CONTROLLER404') || define('CONTROLLER404', 'ctrl404');
-
-
 defined('PATH_ROOT') || define('PATH_ROOT', realpath(dirname(__FILE__).DS.'..'.DS.'..'.DS).DS);
 defined('PATH_VIEW') || define('PATH_VIEW', PATH_ROOT.'app'.DS.'views'.DS);
 defined('PATH_MODEL') || define('PATH_MODEL', PATH_ROOT.'app'.DS.'models'.DS);
@@ -28,17 +26,20 @@ defined('PATH_CHU') || define('PATH_CHU', PATH_APP.'chunks'.DS);
 defined('PATH_CHU_SIS') || define('PATH_CHU_SIS', PATH_CORE.'lib'.DS.'chunks'.DS);
 defined('PATH_SNI') || define('PATH_SNI', PATH_APP.'snippets'.DS);
 defined('PATH_SNI_SIS') || define('PATH_SNI_SIS', PATH_CORE.'lib'.DS.'snippets'.DS);
+
 defined('AUTO_PARSE') || define('AUTO_PARSE', true);
 defined('PROTOCOL') || define('PROTOCOL', 'http' . (((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] == 'on')) ? 's' : ''));
 defined('LOCAL_FOLDER') || define('LOCAL_FOLDER', ONLINE ? '' : basename(dirname(dirname(  dirname(__FILE__) ))));
 defined('BASE_FOLDER') || define('BASE_FOLDER', ONLINE ? '' :  LOCAL_FOLDER . US );
+defined('PATH_JS') || define('PATH_JS', BASE_FOLDER.'js'.DS);
+defined('PATH_CSS') || define('PATH_CSS', BASE_FOLDER.'css'.DS);
 defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $_SERVER['SERVER_NAME'] . US);
 defined('URL_BASE') || define('URL_BASE', URL_ROOT . BASE_FOLDER);
 defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');
 //  activate to pick up labels and get files for lang
 defined('CUMULATE_LANG') || define('CUMULATE_LANG', false);
-$_SESSION['lang'] = DEFAULT_LANG;
 
+$_SESSION['lang'] = DEFAULT_LANG;
 
 if (preg_match('/^http:\/\/localhost/', URL_ROOT) && !!ONLINE) {
     die('IT seems like ONLINE parameter should be set to TRUE in '. __FILE__);
@@ -46,9 +47,6 @@ if (preg_match('/^http:\/\/localhost/', URL_ROOT) && !!ONLINE) {
 if (!preg_match('/^http:\/\/localhost/', URL_ROOT) && !ONLINE) {
     die('IT seems like ONLINE parameter should be set to FALSE in '. __FILE__);
 }
-
-
-
 
 /*   
  * 

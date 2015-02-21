@@ -1,9 +1,13 @@
 <meta charset="UTF-8">
 <title>[$title$]</title>
-<link rel="stylesheet" href="[D[URL_BASE]D]css/style.css" />
-<script src="[D[URL_BASE]D]js/jquery-1.4.2.min.js"></script>
-<script src="[D[URL_BASE]D]js/3dEngine.js"></script>
-<script src="[D[URL_BASE]D]js/objs/sphere.js"></script>
+{C{css/style.css}C}
+{J{js/jquery-1.4.2.min.js}J}
+<script>JMVCshut = true;</script>
+{J{js/jmvc.js}J}
+{J{js/3dEngine.js}J}
+{J{js/objs/sphere.js}J}
+{J{js/Threede/Threede.js}J}
+
 <script>
 	jQuery(
 		function() {
@@ -16,7 +20,6 @@
 
 			var scene = new Scene3D();
 			scene.addToScene(item);
-
 
 			var animateIt = function(){
 				axisRotation.y += .01

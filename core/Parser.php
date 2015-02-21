@@ -7,10 +7,6 @@
 //
 
 /**
-	To use it u need
-	- a html::tag helper
- *
- *
  *
  *	[$varname$]
  *	[D[]D]		defined
@@ -25,6 +21,7 @@
  *	[T[]T]		translation
  *
  */
+
 class Parser {
 	private $rulez;
 	private $content;
@@ -46,6 +43,7 @@ class Parser {
 		$min = '([a-zA-Z0-9_]{1,})';
 		$base = '([a-zA-Z0-9_\-]{1,})';
 		$lng = '([a-zA-Z0-9_\->\s]{1,})';
+		$file = '([a-zA-Z0-9_\-./]*)';
 		$this->rulez = array(
 			'Tvars'	=>array('preg'=>'!\[\$'.$base.'\$\]!Uis',			'params'=>array('pre'=>'[$','post'=>'$]') ),
 			'defV'	=>array('preg'=>'!\[D\['.$base.'\]D\]!Uis',			'params'=>array('pre'=>'[D[','post'=>']D]') ),
@@ -55,10 +53,10 @@ class Parser {
 			'chu'	=>array('preg'=>'!\{\{'.$base.'\}\}!Uis',			'params'=>array('pre'=>'{{','post'=>'}}') ),
 			'sniNP'	=>array('preg'=>'!\[\['.$base.'\]\]!Uis',			'params'=>array('pre'=>'[[','post'=>']]') ),
 			'sniP'	=>array('preg'=>'!\[\['.$base.'\s?[&](.*)\]\]!Uis',	'params'=>array('pre'=>'[[','post'=>']]') ),
-		//	'Sjs'	=>array('preg'=>'!\{sJ\{'.$base.'\}Js\}!Uis',		'params'=>array('path'=>PATH_sJS,'pre'=>'{sJ{','post'=>'}Js}')),
-		//	'Scss'	=>array('preg'=>'!\{sC\{'.$base.'\}Cs\}!Uis',		'params'=>array('path'=>PATH_sCSS,'pre'=>'{sC{','post'=>'}Cs}') ),
-		//	'js'	=>array('preg'=>'!\{J\{'.$base.'\}J\}!Uis',			'params'=>array('path'=>PATH_JS,'pre'=>'{J{','post'=>'}J}') ),
-		//	'css'	=>array('preg'=>'!\{C\{'.$base.'\}C\}!Uis',			'params'=>array('path'=>PATH_CSS,'pre'=>'{C{','post'=>'}C}') ),
+		
+			'js'	=>array('preg'=>'!\{J\{'.$file.'\}J\}!Uis',			'params'=>array('path'=>PATH_JS,'pre'=>'{J{','post'=>'}J}') ),
+			'css'	=>array('preg'=>'!\{C\{'.$file.'\}C\}!Uis',			'params'=>array('path'=>PATH_CSS,'pre'=>'{C{','post'=>'}C}') ),
+
 			'trans'	=>array('preg'=>'!\[T\['.$lng.'\]T]!Uis',			'params'=>array('pre'=>'[T[','post'=>']T]') ),
 			'php'	=>array('preg'=>'!\[\[php\s'.$min.'::(.*)\]\]!Uis', 'params'=>array('pre'=>'[[php ', 'post'=>']]'))
 		);
@@ -77,7 +75,7 @@ class Parser {
 	}
 
 	public function parse() {
-
+		
 		extract($this->variables);
 
 		foreach($this->rulez as $type => $properties) {
@@ -92,6 +90,7 @@ class Parser {
 				$this->$f($out, $pars);
 			}
 		}
+
 		//go deep down as permitted if necessary!
 		while(
 			preg_match(	$this->rulez['Tvars']['preg'],		$this->content)
@@ -102,13 +101,12 @@ class Parser {
 			|| preg_match(	$this->rulez['chu']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['sniNP']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['sniP']['preg'],	$this->content)
-			//|| preg_match(	$this->rulez['js']['preg'],		$this->content)
-			//|| preg_match(	$this->rulez['css']['preg'],	$this->content)
-			//|| preg_match(	$this->rulez['Sjs']['preg'],	$this->content)
-			//|| preg_match(	$this->rulez['Scss']['preg'],	$this->content)
+			|| preg_match(	$this->rulez['js']['preg'],		$this->content)
+			|| preg_match(	$this->rulez['css']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['trans']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['php']['preg'],	$this->content)
 		){
+			
 			if($this->_anti_recursion_counter > $this->_anti_recursion_cutoff) {
 				throw new ParseRecursionException('<br /><h3>Parser is going too deep! Request aborted</h3>');
 				die();exit;
@@ -156,17 +154,12 @@ class Parser {
 			$tmp = ob_get_clean();
 			$this->content = str_replace($out[0][$k], $tmp, $this->content);
 		}
-		
-		 
-
 	}
 
 	/**
 	 * parse [$variable$]
 	 */
 	private function get_Tvars($out, $params) {
-		
-		//print_r($this->variables);
 		extract($this->variables);
 		$pre = $params['pre'];
 		$post = $params['post'];
@@ -310,7 +303,29 @@ class Parser {
 	}
 */
 
+	private function get_js($out, $params) {
+		foreach($out[1] as $k => $val) {
+			if (file_exists(BASE_FOLDER . $val)){
+				$this->content = str_replace(
+					$params['pre'] . $val . $params['post'],
+					'<script src="'.URL_BASE . $val.'"></script>',
+					$this->content
+				);
+			}
+		}
+	}
 
+	private function get_css($out, $params) {
+		foreach($out[1] as $k => $val) {
+			if (file_exists(BASE_FOLDER . $val)){
+				$this->content = str_replace(
+					$params['pre'] . $val . $params['post'],
+					'<link rel="stylesheet" href="'.URL_BASE . $val.'">',
+					$this->content
+				);
+			}
+		}
+	}
 
 	private function get_trans($out, $params) {
 
