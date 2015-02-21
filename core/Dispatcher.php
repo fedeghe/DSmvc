@@ -17,6 +17,8 @@ class Dispatcher{
 			if (!empty($url[0])){
 				$action = $url[0];
 				array_shift($url);
+			} else {
+				$action = DEFAULT_ACTION;	
 			}
 
 		} else {
