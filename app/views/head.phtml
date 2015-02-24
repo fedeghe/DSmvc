@@ -3,24 +3,20 @@
 {C{css/style.css}C}
 {J{js/jquery-1.4.2.min.js}J}
 <script>JMVCshut = true;</script>
-{J{js/jmvc.js}J}
 {J{js/3dEngine.js}J}
 {J{js/objs/sphere.js}J}
 {J{js/Threede/Threede.js}J}
-
 <script>
 	jQuery(
 		function() {
-			var camera = new Camera3D();
-			camera.init(0,0,0,200);
-
-			var item = new Object3D($("#item"));
+			var camera = new Camera3D(),
+				item = new Object3D($("#item")),
+				scene = new Scene3D();
 
 			item.addChild(new Sphere(150));
-
-			var scene = new Scene3D();
+			camera.init(0,0,0,200);
 			scene.addToScene(item);
-
+			
 			var animateIt = function(){
 				axisRotation.y += .01
 				axisRotation.x += .002
