@@ -1,15 +1,23 @@
-<?php
+    <?php
 
 class index extends Controller{
 
     public function action_index($params){
         
-        $x = new View('head');
+        $x = DSmvc::getView('head');
         $Person = new Person('Federico', 'Ghedina');
         $x->title = "DSmvc ~ " . $Person->sayHello();
 
         $v = new View('default');
         $v->head = $x->display();
+
+        $places = Places::getAll();
+        
+        $_SESSION['user'] = array(
+            'fk_group' => 2
+        );
+
+        utility::print_d($places);
 
         Response::send($v->display());
     }

@@ -43,6 +43,13 @@ class View {
 		}
 	}
 
+	public function set() {
+		$args = func_get_args();
+		for ($i = 0, $l = count($args); $i < $l -1; $i+=2) {
+			$this->properties[$args[$i]] = $args[$i + 1];
+		}
+	}
+
 	// parse view properties and return output
 	public function display() {
 

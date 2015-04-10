@@ -1,5 +1,13 @@
 <?php
 
+mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+mb_http_input('UTF-8');
+mb_language('uni');
+mb_regex_encoding('UTF-8');
+
+
+
 session_start();
 
 function debug($a) {
@@ -14,7 +22,11 @@ defined('US') || define('US', '/');
 defined('DEFAULT_CONTROLLER') || define('DEFAULT_CONTROLLER', 'index');
 defined('DEFAULT_ACTION') || define('DEFAULT_ACTION', 'index');
 defined('CONTROLLER404') || define('CONTROLLER404', 'ctrl404');
+defined('LOCAL_FOLDER') || define('LOCAL_FOLDER', ONLINE ? '' : basename(dirname(dirname(  dirname(__FILE__) ))));
+defined('BASE_FOLDER') || define('BASE_FOLDER', ONLINE ? '' :  LOCAL_FOLDER . US );
+
 defined('PATH_ROOT') || define('PATH_ROOT', realpath(dirname(__FILE__).DS.'..'.DS.'..'.DS).DS);
+
 defined('PATH_VIEW') || define('PATH_VIEW', PATH_ROOT.'app'.DS.'views'.DS);
 defined('PATH_MODEL') || define('PATH_MODEL', PATH_ROOT.'app'.DS.'models'.DS);
 defined('PATH_CONTROLLER') || define('PATH_CONTROLLER', PATH_ROOT.'app'.DS.'controllers'.DS);
@@ -22,24 +34,34 @@ defined('PATH_CONFIG') || define('PATH_CONFIG', PATH_ROOT.'core'.DS.'config'.DS)
 defined('PATH_APP') || define('PATH_APP', PATH_ROOT.'app'.DS);
 defined('PATH_CORE') || define('PATH_CORE', PATH_ROOT.'core'.DS);
 defined('PATH_TRANSLATIONS') || define('PATH_TRANSLATIONS', PATH_ROOT.'app'.DS.'i18n'.DS);
+
 defined('PATH_CHU') || define('PATH_CHU', PATH_APP.'chunks'.DS);
 defined('PATH_CHU_SIS') || define('PATH_CHU_SIS', PATH_CORE.'lib'.DS.'chunks'.DS);
 defined('PATH_SNI') || define('PATH_SNI', PATH_APP.'snippets'.DS);
 defined('PATH_SNI_SIS') || define('PATH_SNI_SIS', PATH_CORE.'lib'.DS.'snippets'.DS);
 
+defined('REL_PATH_JS') || define('REL_PATH_JS', BASE_FOLDER.'js'.DS);
+defined('REL_PATH_CSS') || define('REL_PATH_CSS', BASE_FOLDER.'css'.DS);
+
+
+
 defined('AUTO_PARSE') || define('AUTO_PARSE', true);
 defined('PROTOCOL') || define('PROTOCOL', 'http' . (((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] == 'on')) ? 's' : ''));
-defined('LOCAL_FOLDER') || define('LOCAL_FOLDER', ONLINE ? '' : basename(dirname(dirname(  dirname(__FILE__) ))));
-defined('BASE_FOLDER') || define('BASE_FOLDER', ONLINE ? '' :  LOCAL_FOLDER . US );
-defined('PATH_JS') || define('PATH_JS', BASE_FOLDER.'js'.DS);
-defined('PATH_CSS') || define('PATH_CSS', BASE_FOLDER.'css'.DS);
+
 defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $_SERVER['SERVER_NAME'] . US);
 defined('URL_BASE') || define('URL_BASE', URL_ROOT . BASE_FOLDER);
+defined('URL_JS') || define('URL_JS', URL_BASE . REL_PATH_JS);
+defined('URL_CSS') || define('URL_CSS', URL_BASE . REL_PATH_CSS);
+
 defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');
 //  activate to pick up labels and get files for lang
 defined('CUMULATE_LANG') || define('CUMULATE_LANG', false);
 
+defined('FWK') || define('FWK', 'FWK');
+defined('DSMVC') || define('DSMVC', true);
+
 $_SESSION['lang'] = DEFAULT_LANG;
+
 
 if (preg_match('/^http:\/\/localhost/', URL_ROOT) && !!ONLINE) {
     die('IT seems like ONLINE parameter should be set to TRUE in '. __FILE__);
@@ -47,6 +69,9 @@ if (preg_match('/^http:\/\/localhost/', URL_ROOT) && !!ONLINE) {
 if (!preg_match('/^http:\/\/localhost/', URL_ROOT) && !ONLINE) {
     die('IT seems like ONLINE parameter should be set to FALSE in '. __FILE__);
 }
+
+
+
 
 /*   
  * 
@@ -99,7 +124,6 @@ $_REQUEST   = array_map( 'strip_defined_ph', $_REQUEST );
 
 
 
-
 /*
 debug(array(
     'ONLINE' => ONLINE,
@@ -111,6 +135,8 @@ debug(array(
     'PATH_APP' => PATH_APP,
     'PATH_CORE' => PATH_CORE,
     'PATH_CHU' => PATH_CHU,
+    'REL_PATH_CSS' => REL_PATH_CSS,
+    'REL_PATH_JS' => REL_PATH_JS,
     'PATH_CHU_SIS' => PATH_CHU_SIS,
     'PATH_SNI' => PATH_SNI,
     'PATH_SNI_SIS' => PATH_SNI_SIS,
@@ -118,6 +144,8 @@ debug(array(
     'LOCAL_FOLDER' => LOCAL_FOLDER,
     'BASE_FOLDER' => BASE_FOLDER,
     'URL_ROOT' => URL_ROOT,
-    'URL_BASE' => URL_BASE
+    'URL_BASE' => URL_BASE,
+    'URL_JS' => URL_JS,
+    'URL_CSS' => URL_CSS
 ));
 */

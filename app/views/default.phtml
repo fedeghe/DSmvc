@@ -3,8 +3,8 @@
 	<head>
 		<?php echo $head; ?>{{prova}}
 		<?php
-			$out = str_repeat('<li>&bull;</li>',27);
-			if(isSet($nome)){
+			$out = str_repeat('<li>&bull;</li>', 27);
+			if (isSet($nome)) {
 				$out='';
 				$a = str_split($nome);
 				foreach($a as $char)$out.='<li>'.$char.'</li>';
