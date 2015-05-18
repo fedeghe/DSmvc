@@ -28,7 +28,7 @@ class db{
 	}
 
 	public function __destruct(){
-		$_SESSION[FWK]['mysql_time'] =  $this->time;
+		$_SESSION[APP_NAME]['mysql_time'] =  $this->time;
 		$this->disconnect();
 	}
 

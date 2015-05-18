@@ -10,7 +10,7 @@ class Places {
             '*',
             'places',
             $_SESSION['user']['fk_group']
-        ),true, true);
+        ),true, false);
         return json_encode($db->fetch_all_assoc($res));
 	}
 }

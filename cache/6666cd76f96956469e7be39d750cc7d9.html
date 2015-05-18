@@ -1,0 +1,52 @@
+s:1588:"<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+<title>DSmvc ~ Hello I`m Federico Ghedina</title>
+<link rel="stylesheet" href="http://www.dsmvc.dev/css/style.css">
+<script src="http://www.dsmvc.dev/js/jquery-1.4.2.min.js"></script>
+<script>JMVCshut = true;</script>
+<script src="http://www.dsmvc.dev/js/3dEngine.js"></script>
+<script src="http://www.dsmvc.dev/js/objs/sphere.js"></script>
+<script src="http://www.dsmvc.dev/js/Threede/Threede.js"></script>
+<script>
+	jQuery(
+		function() {
+			var camera = new Camera3D(),
+				item = new Object3D($("#item")),
+				scene = new Scene3D();
+
+			item.addChild(new Sphere(150));
+			camera.init(0,0,0,200);
+			scene.addToScene(item);
+			
+			var animateIt = function(){
+				axisRotation.y += .01
+				axisRotation.x += .002
+				axisRotation.z += .02
+
+				scene.renderCamera(camera);
+			};
+
+			setInterval(animateIt, 20);
+
+			jQuery('li').fadeIn();
+		}
+	);
+
+</script>
+<h1>Chunk prova</h1>
+			</head>
+	<body>
+		<div id="item">
+            <ul><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li><li>&bull;</li></ul>
+        </div>
+		<h1>Foo~evenMoreFoo</h1>
+		<br>
+		<h1>System Federico</h1>
+		http://www.dsmvc.dev/
+		<hr>
+		why - <i class="untranslated" title="not translated">hello</i>
+	</body>
+</html>
+";

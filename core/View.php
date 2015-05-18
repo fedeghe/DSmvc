@@ -23,6 +23,8 @@ class View {
 				echo 'View `'. $viewfile.'` not found!';
 			}
 		}
+		// default title
+		$this->title = APP_NAME . ' :: ' .DSMVC::$action;
 	}
 
 	public function  __destruct() {
@@ -43,11 +45,16 @@ class View {
 		}
 	}
 
-	public function set() {
-		$args = func_get_args();
-		for ($i = 0, $l = count($args); $i < $l -1; $i+=2) {
-			$this->properties[$args[$i]] = $args[$i + 1];
+	public function set ($property, $value=false) {
+		if (is_array($property)) {
+			foreach ($property as $k => $v) {
+				$this->properties[$k] = $v;	
+			}
+		} else {
+			$this->properties[$property] = $value;
 		}
+		//chain
+		return $this;
 	}
 
 	// parse view properties and return output
@@ -58,15 +65,13 @@ class View {
 		include($this->viewfile);
 		//echo $this->viewfile;
 		$content = ob_get_clean();
-		
+
 		if (AUTO_PARSE){
 			$parser = Factory::getParser($content, $this->properties);
 			$content = $parser->parse();
 		}
-		return $content;
-		
-		
-		
+
+		return $content;		
 	}
 
 

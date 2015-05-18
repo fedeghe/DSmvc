@@ -42,7 +42,7 @@ class Parser {
 
 		$min = '([a-zA-Z0-9_]{1,})';
 		$base = '([a-zA-Z0-9_\-]{1,})';
-		$lng = '([a-zA-Z0-9_\->\s]{1,})';
+		$lng = '(.*)';
 		$file = '([a-zA-Z0-9_\-./]*)';
 		$this->rulez = array(
 			'Tvars'	=>array('preg'=>'!\[\$'.$base.'\$\]!Uis',			'params'=>array('pre'=>'[$','post'=>'$]') ),
@@ -56,6 +56,10 @@ class Parser {
 		
 			'js'	=>array('preg'=>'!\{J\{'.$file.'\}J\}!Uis',			'params'=>array('path'=>PATH_JS,'pre'=>'{J{','post'=>'}J}') ),
 			'css'	=>array('preg'=>'!\{C\{'.$file.'\}C\}!Uis',			'params'=>array('path'=>PATH_CSS,'pre'=>'{C{','post'=>'}C}') ),
+
+			'view'		=>array('preg'=>'!\[V\['.$base.'(\s[&](.*))?\]V\]!Uis',	'params'=>array('pre'=>'[V[','post'=>']V]') ),
+
+			'trans_soft'=>array('preg'=>'!\[t\['.$lng.'\]t]!Us',			'params'=>array('pre'=>'[t[','post'=>']t]') ),
 
 			'trans'	=>array('preg'=>'!\[T\['.$lng.'\]T]!Uis',			'params'=>array('pre'=>'[T[','post'=>']T]') ),
 			'php'	=>array('preg'=>'!\[\[php\s'.$min.'::(.*)\]\]!Uis', 'params'=>array('pre'=>'[[php ', 'post'=>']]'))
@@ -103,6 +107,7 @@ class Parser {
 			|| preg_match(	$this->rulez['sniP']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['js']['preg'],		$this->content)
 			|| preg_match(	$this->rulez['css']['preg'],	$this->content)
+			|| preg_match(	$this->rulez['view']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['trans']['preg'],	$this->content)
 			|| preg_match(	$this->rulez['php']['preg'],	$this->content)
 		){
@@ -119,19 +124,24 @@ class Parser {
 
 		//maybe cumulate label must be merged
 		if (CUMULATE_LANG) {
+			$lang_path = PATH_TRANSLATIONS.$_SESSION['lang'].'.php';
+
 			//get actual
 			$mah_trans = array();
-			if(file_exists(PATH_TRANSLATIONS.DEFAULT_LANG.'.php'))
-				include(PATH_TRANSLATIONS.DEFAULT_LANG.'.php');
-				
-			//$tmp = parse_ini_file(PATH_TRANSLATIONS.DEFAULT_LANG.'.ini');
-			$new = array_merge($mah_trans, $this->cumulated_labels_for_translation);
-			$data = '<?php'."\n".'$trans=array('."\n";
-			foreach($new as $k => $v){
-				$data.='"'.$k.'" => "'.$v.'"'.",\n";
+			if (file_exists($lang_path)) {
+				include($lang_path);
+				$mah_trans = $trans;
 			}
-			$data.=");";
-			file_put_contents(PATH_TRANSLATIONS.DEFAULT_LANG.'.php', $data);
+
+			$new = array_merge($mah_trans, $this->cumulated_labels_for_translation);
+			ksort($new);
+			$data = '<?php'."\n".'$trans = array(';
+
+			foreach ($new as $k => $v) {
+				$data.="\n\t".'"'.$k.'" => "'.$v.'"'.",";
+			}
+			$data.="\n);";
+			file_put_contents($lang_path, $data);
 		}
 
 
@@ -176,6 +186,22 @@ class Parser {
 		$post = $params['post'];
 		foreach($out[1] as $k => $val)
 			$this->content = str_replace($pre.$val.$post, defined($val)?constant($val):'', $this->content);
+	}
+
+	private function get_view($out, $params) {
+
+		foreach($out[1] as $k => $val) {
+			ob_start();
+			if (file_exists(PATH_VIEW.$val.'.phtml')) {
+				include(PATH_VIEW.$val.'.phtml');
+			}
+			$view = ob_get_clean();
+			$this->content = str_replace(
+				$params['pre'].$val.$params['post'],
+				$view,
+				$this->content
+			);
+		}
 	}
 
 	/**
@@ -291,17 +317,6 @@ class Parser {
 				$this->content
 			);
 	}
-/*
-	private function get_trans($out, $params) {
-		//debug($out);
-		foreach($out[1] as $k => $val)
-			$this->content = str_replace(
-				$params['pre'].$val.$params['post'],
-				$val,
-				$this->content
-			);
-	}
-*/
 
 	private function get_js($out, $params) {
 		foreach($out[1] as $k => $val) {
@@ -327,7 +342,12 @@ class Parser {
 		}
 	}
 
-	private function get_trans($out, $params) {
+	private function get_trans_soft($out, $params) {
+
+		$this->get_trans($out, $params, true);
+	}
+
+	private function get_trans($out, $params, $soft = FALSE) {
 
 		$dest_lang = isSet($_SESSION['lang'])?$_SESSION['lang'] : DEFAULT_LANG;
 
@@ -353,19 +373,28 @@ class Parser {
 				$transL = array();
 				if($exists){
 					include(PATH_TRANSLATIONS.$dest_lang.'.php');
-					$transL = $mah_trans;
+					$transL = $trans;
 				}
 
-				$x = ($exists && isSet($transL[$label])) ? $transL[$label] : '<i title="not translated">'.$label.'</i>';
+				// that reduce usage, in fact cannot use in a attribute like a title or a alt
+				$x = ($exists && isSet($transL[$label]) && $transL[$label]!=$label) ?
+					$transL[$label]
+					:
+					($soft ?  $label : '<i class="untranslated" title="not translated">'.$label.'</i>');
 			}else{
-				$x = (isSet($trans[$label])) ? $trans[$label] : '<i title="not translated">'.$label.'</i>';
+
+				// same here
+				$x = (isSet($trans[$label]) && $trans[$label]!=$label) ?
+					$trans[$label]
+					:
+					($soft ? $label : '<i class="untranslated" title="not translated">'.$label.'</i>');
 			}
 
-			//replace
+			// replace
 			$this->content = str_replace($params['pre'].$val.$params['post'], $x, $this->content);
 
-			//if CUMULATE_LANG is active we only pick up labels
-			if(CUMULATE_LANG){
+			// pick up labels if CUMULATE_LANG is true
+			if(CUMULATE_LANG && !array_key_exists($label, $trans)){
 				$this->cumulated_labels_for_translation[$label] = $label;
 			}	
 		}

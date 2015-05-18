@@ -1,6 +1,5 @@
 <?php
-include(realpath(dirname(__FILE__).'/../core/config/base.inc.php'));
-include(realpath(dirname(__FILE__).'/../core/Autoloader.php'));
+require_once(realpath(dirname(__FILE__).'/../core/config/bootstrap.php'));
 
 // handle request and dispatch it to the appropriate controller
 try{ Dispatcher::dispatch(); }

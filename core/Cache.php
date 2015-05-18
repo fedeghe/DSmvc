@@ -2,36 +2,29 @@
 
 class Cache{
 
-	private $cachedir = 'cache/';
-	private $expire = 60;
+	private static $cachedir = PATH_CACHE;
+	private static $expire = 60;
 	private static $instance = NULL;
+
+	private static $ext = '.html';
+
+
 	
-	// get Singleton instance of Cache class
-	public static function getInstance($cachedir = '') {
 
-		if (self::$instance === NULL) {
-			self::$instance = new self($cachedir);
-		}
-		return self::$instance;
-	}
-	
-	// constructor
-	public function __construct($cachedir = ''){
-
-		if ($cachedir !== '') {
-
-			if (!is_dir($cachedir) or !is_writable($cachedir)) {
-
-				throw new Exception('Cache directory must be a valid writeable directory.');	
-			}
-			$this->cachedir = $cachedir;
+	public static function check() {
+		$id = md5(URL);
+		if (self::valid($id)) {
+			echo self::get($id);
+			die();
+		} else {
+			Response::$id = $id;
 		}
 	}
 	
 	// write data to cache file given an ID
-	public function set($id, $data) {
+	public static function set($id, $data) {
 
-		$file = $this->cachedir . $id;
+		$file = self::$cachedir . $id . self::$ext;
 		if (file_exists($file)) {
 
 			unlink($file);
@@ -44,9 +37,12 @@ class Cache{
 	}
 	
 	// read data from cache file given an ID
-	public function get($id) {
+	public static function get($id) {
 		
-		$file = glob($this->cachedir . $id);
+		$file = glob(self::$cachedir . $id . self::$ext);
+		if (!count($file)) {
+			return false;
+		}
         $file = array_shift($file);
 		if (!$data = file_get_contents($file)) {
 
@@ -56,10 +52,13 @@ class Cache{
 	}
 	
 	// check if the cache file is valid or not
-	public function valid($id) {
+	public static function valid($id) {
 
-		$file = glob($this->cachedir . $id);
+		$file = glob(self::$cachedir . $id . self::$ext);
+		if (!count($file)) {
+			return false;
+		}
         $file = array_shift($file);
-		return (bool)(time() - filemtime($file) <= $this->expire);
+		return (bool)(time() - filemtime($file) <= self::$expire);
 	}
 }// End Cache class

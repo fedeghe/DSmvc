@@ -1,10 +1,10 @@
-    <?php
+<?php
 
 class index extends Controller{
 
     public function action_index($params){
         
-        $x = DSmvc::getView('head');
+        $x = DSMVC::getView('head');
         $Person = new Person('Federico', 'Ghedina');
         $x->title = "DSmvc ~ " . $Person->sayHello();
 
@@ -17,7 +17,7 @@ class index extends Controller{
             'fk_group' => 2
         );
 
-        utility::print_d($places);
+        // utility::print_d($places);
 
         Response::send($v->display());
     }

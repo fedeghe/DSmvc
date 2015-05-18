@@ -1,4 +1,5 @@
 <?php
+
 class Controller{
 
 	private $vars;
@@ -10,10 +11,14 @@ class Controller{
 	}
 	
 
-	public function after () {}
+	public function after () {
+
+	}
 	
 
-	public function before () {}
+	public function before () {
+		CACHE_ACTIVE && Cache::check();
+	}
 	
 
 	public function __call ($name, $arguments) {
