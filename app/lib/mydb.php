@@ -2,7 +2,7 @@
 
 defined('DSMVC') OR die('No direct access allowed!');
 
-class mydb extends db{
+class mydb extends db{ 
 
 	private $pars;
 	
