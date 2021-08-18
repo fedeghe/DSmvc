@@ -48,13 +48,13 @@ class Dispatcher{
 		}catch(Exception $e) {
 			if (defined('CONTROLLER404')) {
 				DSMVC::$controller = CONTROLLER404;
-				DSMVC::$action = 'action_index';
+				DSMVC::$action = 'index';
 			} else {
 				die("Controller `$controller.php` not found");
 			}
 		}
 
-		Request::handle(DSMVC::$controller, 'action_' . DSMVC::$action, $url);
+		Request::handle(DSMVC::$controller, 'action_' . DSMVC::$action, $url, URL_COMPLETE);
 		echo Response::getContent();
     }
 }// End Dispatcher class

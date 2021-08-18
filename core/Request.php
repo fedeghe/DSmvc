@@ -5,7 +5,7 @@ class Request{
 
 	private function __construct () {}
 	
-	public static function handle ($controller, $action, $arg = NULL) {
+	public static function handle ($controller, $action, $arg = NULL, $url) {
 
 		$params = array();
 		preg_match('/^action_(.*)/', $action, $matches);
@@ -46,7 +46,7 @@ class Request{
 		}
 		
 		//action existance is managed by controller protected __call
-		self::$_controllerInstance[$controller]->$action($params);
+		self::$_controllerInstance[$controller]->$action($params, $url);
 
 
 		if (method_exists(self::$_controllerInstance[$controller], 'after_' . $actionName)) {
