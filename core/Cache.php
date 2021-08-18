@@ -3,13 +3,12 @@
 class Cache{
 
 	private static $cachedir = PATH_CACHE;
+
 	private static $expire = 60;
+
 	private static $instance = NULL;
 
 	private static $ext = '.html';
-
-
-	
 
 	public static function check() {
 		$id = md5(URL);
@@ -26,10 +25,15 @@ class Cache{
 
 		$file = self::$cachedir . $id . self::$ext;
 		if (file_exists($file)) {
-
 			unlink($file);
 		}
 		// write data to cache
+		// after removing newlines, space between tags, mutliple spaces, tabs
+		$data = preg_replace("/\n/", "", $data);
+		$data = preg_replace("/>\s*</m", "><", $data);
+		$data = preg_replace("/\s\s+/m", " ", $data);
+		$data = preg_replace("/\t+/m", "", $data);
+
 		if (!file_put_contents($file, serialize($data))) {
 
 			throw new Exception('Error writing data to cache file.');

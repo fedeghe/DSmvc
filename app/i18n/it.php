@@ -1,5 +1,5 @@
 <?php
-$trans=array(
-"perche" => "perche",
-"hello" => "ciao",
+$trans = array(
+	"hello" => "ciao",
+	"perche" => "perche",
 );

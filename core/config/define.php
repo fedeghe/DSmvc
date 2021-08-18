@@ -36,7 +36,7 @@ defined('PATH_SNI') || define('PATH_SNI', PATH_APP.'snippets'.DS);
 defined('PATH_SNI_SIS') || define('PATH_SNI_SIS', PATH_CORE.'lib'.DS.'snippets'.DS);
 
 defined('PATH_CACHE') || define('PATH_CACHE', PATH_ROOT.'cache'.DS);
-defined('CACHE_ACTIVE') || define('CACHE_ACTIVE', true);
+defined('CACHE_ACTIVE') || define('CACHE_ACTIVE', false);
 
 
 defined('AUTO_PARSE') || define('AUTO_PARSE', true);
@@ -56,7 +56,7 @@ defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');
 //  activate to pick up labels and get files for lang
 defined('CUMULATE_LANG') || define('CUMULATE_LANG', true);
 
-defined('ERROR_LEVEL') || define('ERROR_LEVEL', 13/* 2<<13 -1 */ );
+defined('ERROR_LEVEL') || define('ERROR_LEVEL', 1/* 2<<13 -1 */ );
 defined('STACKTRACE_ENABLED') || define('STACKTRACE_ENABLED', true);
 
 

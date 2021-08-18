@@ -50,15 +50,6 @@ class db{
 		$this->time += ($this->tmp_end - $this->tmp_start);
 	}
 
-
-
-
-
-
-	///////////////////////////////////////////////////////////
-
-
-
 	/**
 	 *	Perform a query
 	 *
@@ -76,13 +67,13 @@ class db{
 			foreach($pars as $ph => $pv) {
 				
 				$place = strpos($s,"?",$pos);
-				
-				$s = substr_replace(
-					$s,
-					$preparsed ? $pv : mysqli_real_escape_string($this->db, $pv),
-					$place,
-					1
-				);
+				if ($place)
+					$s = substr_replace(
+						$s,
+						$preparsed ? $pv : mysqli_real_escape_string($this->db, $pv),
+						$place,
+						1
+					);
 				$pos = $place;
 			}
 		}
@@ -93,8 +84,8 @@ class db{
 			return true;
 		}
 
-		$res = (trim($s)!='')?@mysqli_query($this->db, $s):false;
-
+		$res = (trim($s)!='') ? mysqli_query($this->db, $s) : false;
+		// echo $res ? 'true' : 'false';
 		$this->t_end();
 		return $res ;
 	}

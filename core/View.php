@@ -63,7 +63,7 @@ class View {
 		extract($this->properties);
 		ob_start();
 		include($this->viewfile);
-		//echo $this->viewfile;
+		
 		$content = ob_get_clean();
 
 		if (AUTO_PARSE){

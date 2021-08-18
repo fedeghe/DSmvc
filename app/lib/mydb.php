@@ -10,15 +10,15 @@ class mydb extends db{
 
 	public function __construct($location = false){
 
-		$loc = $location ? $location : 'localhost';
+		$loc = $location ? $location : DB;
 
 		switch ($loc) {
-			case 'localhost':
+			case 'local':
 				$this->pars = array(
 					'user' => 'root',
 					'pwd' => 'maremma',
-					'host' => 'localhost',
-					'db' => 'stailaplaces'
+					'host' => '127.0.0.1',
+					'db' => 'wavescores'
 				);
 			break;
 			default:

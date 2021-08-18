@@ -5,9 +5,9 @@ var Sphere =  function (size){
 	}
 	var grad = 2*Math.PI/360;
 	
-	function g(n){return grad*n;}
+	function g(n){return grad * n;}
 	//e inversa
-	function _g(r){return r/grad;}
+	function _g(r){return r / grad;}
     //make3dpoint is a function inherited from
     //DisplayObject3D
     

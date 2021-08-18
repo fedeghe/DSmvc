@@ -249,7 +249,8 @@ class Parser {
 	 * parse [[snippet &par1=`val1`&par2=`val2`]]
 	 */
 	private function get_sniP($out, $params) {
-		for($i = 0 ; $i<count($out[0]); $i++) {
+    
+		for($i = 0 ; $i < count($out[0]); $i++) {
 			//0 match completo
 			//1 primo match ...nome dello snippet
 			//2 secondo match....parametri
@@ -259,22 +260,27 @@ class Parser {
 			foreach($params as $k) {
 				preg_match('/(.*)=`(.*)`/Uis',$k, $matches);
 				list($nome, $val) = explode('=`', $k);
-				$$matches[1] = $matches[2];
+                $vars_names[$matches[1]] = $matches[2];
 				$vars_names[] = $matches[1];
 			}
-			$more = (in_array('snippetpath',$vars_names))? $snippetpath.DS:'';
+            
+			$more = in_array('snippetpath',$vars_names) ? $snippetpath.DS : '';
 			//if($more!=='')die('<h1>'.$more.'</h1>');
 			$snipp = $out[1][$i];
 			$placeholder = $out[0][$i];
 			ob_start();
-			switch(true) {
-				case file_exists(PATH_SNI_SIS.$more.$snipp.'.php'): include(PATH_SNI_SIS.$more.$snipp.'.php');break;
-				//
-				case file_exists(PATH_SNI.$more.$snipp.'.php'): include(PATH_SNI.$more.$snipp.'.php');break;
+            extract($vars_names);
+			if (file_exists(PATH_SNI_SIS.$more.$snipp.'.php')) {
+                include(PATH_SNI_SIS.$more.$snipp.'.php');
+            }
+            if (file_exists(PATH_SNI.$more.$snipp.'.php')) {
+                include(PATH_SNI.$more.$snipp.'.php');
 			}
 			//ora non mi servono + i params
-			foreach($vars_names as $var)unset($$var);
 			$sni = ob_get_clean();
+			foreach($vars_names as $k => $var){
+                unset($$k);
+            }
 			$this->content = str_replace($placeholder, $sni, $this->content);
 		}
 	}
@@ -365,8 +371,8 @@ class Parser {
 
 			// check if user want to overload lang... this allows using a placeholder like [T[hello>zh]T]
 			// just to force the chinese tranlation of a label without looking at the session lang
-			if(strpos($label,'>')!==false){
-				list($label,$dest_lang) = explode('>',$val);
+			if(strpos($label, '>')!==false){
+				list($label, $dest_lang) = explode('>',$val);
 
 				$exists = file_exists(PATH_TRANSLATIONS.$dest_lang.'.php');
 

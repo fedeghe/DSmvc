@@ -8,16 +8,16 @@ class index extends Controller{
         $Person = new Person('Federico', 'Ghedina');
         $x->title = "DSmvc ~ " . $Person->sayHello();
 
-        $v = new View('default');
+        $v = DSMVC::getView('default');
         $v->head = $x->display();
 
-        $places = Places::getAll();
-        
         $_SESSION['user'] = array(
             'fk_group' => 2
         );
 
-        // utility::print_d($places);
+        $places = Places::getAll();
+
+        $v->data = utility::print_d($places, true);
 
         Response::send($v->display());
     }
@@ -36,14 +36,21 @@ class index extends Controller{
         Response::send($v->display());
     }
     
+    public function after_index(){
+        // Response::send(__FILE__.' - method<br />');
+    }
+    public function before_index(){
+        // Response::send(__FILE__.' - method<br />');
+    }
+
     public function after(){
         parent::after();
-        // echo __FILE__.'<br />';
+        // Response::send(__FILE__.' - controller<br />');
     }
 
     public function before(){
         parent::after();
-        // echo __FILE__.'<br />';
+        // Response::send(__FILE__.' - controller<br />');
     }
     
 

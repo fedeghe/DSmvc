@@ -1,5 +1,5 @@
 <?php
 $trans = array(
-	"hello" => "hello",
+	"hello" => "good morning",
 	"perche" => "why",
 );

@@ -1,11 +1,16 @@
 <?php
 class Dispatcher{
 
-	public static function dispatch(){
+	public static function dispatch() {
 
+		ob_start();
+		
+		// maybe we can jump
+		//
+		CACHE_ACTIVE && Cache::check();
 
-		Cache::check();
-
+		// 
+		//
 		$parse = parse_url(URL_COMPLETE);
 
 		$url = explode('/', trim($parse['path'], '/'));
@@ -50,6 +55,6 @@ class Dispatcher{
 		}
 
 		Request::handle(DSMVC::$controller, 'action_' . DSMVC::$action, $url);
-		
+		echo Response::getContent();
     }
 }// End Dispatcher class
