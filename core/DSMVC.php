@@ -24,5 +24,12 @@ class DSMVC {
 	public static function getView($name) {
 		return new View($name);
 	}
+
+    public static function getViews($names) {
+        return array_reduce($names, function ($acc, $el) {
+            $acc[]= new View($el);
+            return $acc;
+        });
+	}
 }
 
