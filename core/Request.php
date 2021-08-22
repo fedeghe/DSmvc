@@ -46,7 +46,7 @@ class Request{
 		}
 		
 		//action existance is managed by controller protected __call
-		self::$_controllerInstance[$controller]->$action($params, $url);
+		self::$_controllerInstance[$controller]->$action($params, $url, $controller, $action);
 
 
 		if (method_exists(self::$_controllerInstance[$controller], 'after_' . $actionName)) {
@@ -58,5 +58,9 @@ class Request{
 		self::$_controllerInstance[$controller]->after();
 		return true;
 	}
+
+    public static function ajaxCheck () {
+        if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || ($_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest')){	die();	}
+    }
 
 }//End Request class
