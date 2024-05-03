@@ -4,16 +4,10 @@ defined('DSMVC') || die('No direct access allowed');
 
 
 class db{
-
 	protected $db;
-
 	private $time;
-
 	private $tmp_start, $tmp_end;
-
-
 	private static $instance;
-
 	public static function get_instance(){
 		if(!isSet(self::$instance)){
 			self::$instance = new self();
@@ -62,10 +56,9 @@ class db{
 	public function query($sql='',$pars = array(), $preparsed = false, $debug=false, $doit=true){
 		$this->t_start();
 		$s = $sql;
-		if(is_array($pars) && count($pars)>0){
+		if (is_array($pars) && count($pars)>0) {
 			$pos = 0;
-			foreach($pars as $ph => $pv) {
-				
+			foreach ($pars as $ph => $pv) {
 				$place = strpos($s,"?",$pos);
 				if ($place)
 					$s = substr_replace(
@@ -78,9 +71,9 @@ class db{
 			}
 		}
 		
-		if($debug)echo'<br />Query:'.date('H:i:s').'<br /><strong>'.$s.'</strong><br />--------------------------/<br />';
+		if ($debug) echo'<br />Query:'.date('H:i:s').'<br /><strong>'.$s.'</strong><br />--------------------------/<br />';
 
-		if(!$doit){
+		if (!$doit) {
 			return true;
 		}
 
@@ -90,14 +83,12 @@ class db{
 		return $res ;
 	}
 
-
 	public function insert_id ($link_identifier=false){
 		$this->t_start();
 		$res = @mysqli_insert_id($link_identifier ? $link_identifier : $this->db);
 		$this->t_end();
 		return $res ;
-	}
-	
+	}	
 	
 	public function affected_rows ($link_identifier=false ){
 		$this->t_start();
@@ -106,15 +97,12 @@ class db{
 		return $res ;
 	}
 
-
 	public function close($link_identifier=false ){
 		$this->t_start();
 		$res = @mysqli_close($link_identifier ? $link_identifier : $this->db);
 		$this->t_end();
 		return $res ;
 	}
-	
-
 		
 	public function errno($link_identifier=false ){
 		$this->t_start();
@@ -123,7 +111,6 @@ class db{
 		return $res ;
 	}
 
-
 	public function error($link_identifier=false ){
 		$this->t_start();
 		$res = @mysqli_error($link_identifier ? $link_identifier : $this->db);
@@ -131,14 +118,12 @@ class db{
 		return $res ;
 	}
 
-
 	public function fetch_array($result){
 		$this->t_start();
 		$res = @mysqli_fetch_array($result);
 		$this->t_end();
 		return $res ;
 	}
-
 
 	public function fetch_assoc ($result){
 		$this->t_start();
@@ -155,14 +140,12 @@ class db{
 		return $ret ;
 	}
 
-
 	public function fetch_row ($result){
 		$this->t_start();
 		$res = @mysqli_fetch_row($result);
 		$this->t_end();
 		return $res ;
 	}
-
 
 	public function free_result ($result){
 		$this->t_start();
@@ -171,14 +154,12 @@ class db{
 		return $res ;
 	}
 
-
 	public function num_rows($result){
 		$this->t_start();
 		$res = @mysqli_num_rows($result);
 		$this->t_end();
 		return $res ;
 	}
-
 
 	public function replacecontent($table, $field, $src, $replace, $where){
 		return $this->query(
@@ -195,8 +176,6 @@ class db{
 		);
 	}
 
-
-
 	public function real_escape_string ($unescaped_string, $link_identifier=false){
 		$this->t_start();
 		$res = @mysqli_real_escape_string ($link_identifier ? $link_identifier : $this->db, $unescaped_string);
@@ -204,26 +183,12 @@ class db{
 		return $res ;
 	}
 
-/*
-	public function result ($result, $row, $field=NULL){
-		$this->t_start();
-		$res = @mysql_result ($result, $row, $field );
-		$this->t_end();
-		return $res ;
-	}
-*/
-
 	public function select_db($db_name, $link_identifier=false){
 		$this->t_start();
 		$res = @mysqli_select_db($link_identifier ? $link_identifier : $this->db, $db_name);
 		$this->t_end();
 		return $res ;
 	}
-
-
-
-
-
 
 	/**
 	* solo per serie di queries in cui non occorre usare risultati intermedi !!!!!!!!!!!!!!
@@ -246,14 +211,12 @@ class db{
 		return $ret;
 	}
 
-
 	public function sql2assoc($sql, $pars = array(), $key=FALSE, $debug=false){
 		return $this->sql2x($sql, $pars, $key, $debug, true);
 	}
 	public function sql2array($sql, $pars = array(), $key=FALSE, $debug=false){
 		return $this->sql2x($sql, $pars, $key, $debug, false);
 	}
-	
 	
 	/**
 	*	gli passi un sql e ti restituisce l'array dei risultati
@@ -282,7 +245,6 @@ class db{
 		return $num > 0;
 	}
 
-
 	public function remove_duplicates($table, $filter, $unique_fields){
 		$queries = array('
 			CREATE TABLE temporary_table as
@@ -293,17 +255,8 @@ class db{
 		return $this->sql_array_transaction($queries);
 	}
 
-
-
 	/*
-	 *
-	 *
-	 * molto utile
-	 * da que tabelle come subscriptions e masters_subscriptions estrae la conta
-	 *
-	 *
-	 *
-	 *
+	 * tabelle come subscriptions e masters_subscriptions estrae la conta
 	 */
 	// subscriptions, masters_subscriptions, id_subscription, fk_subscription, label,
 	public function count_assoc($table, $assoc, $table_pk, $assoc_fk, $select_field, $where="1", $count_alias = 'conta'){
@@ -337,9 +290,7 @@ class db{
 	 * Return the sqlcode to get arbitrary indexed split results
 	 */
 	public function field_split($field, $separator, $num, $alias="split_"){
-
 		$patt = 'SUBSTRING_INDEX(%field%, "'.$separator.'", %index%)';
-
 		$end=false;
 		$i = 0;
 		$split = array();
@@ -369,8 +320,6 @@ class db{
 	
 	public function optimize_table($table){
 		return $this->query('OPTIMIZE TABLE `?` ',array($table));
-	}
-
-
+	} 
 }
 

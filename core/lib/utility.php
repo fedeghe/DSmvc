@@ -1,9 +1,6 @@
 <?php
-
 defined('DSMVC') || die('No direct access allowed');
-
 class utility{
-
 	/**
 	 * prints variable dump
 	 *
@@ -23,8 +20,6 @@ class utility{
 		return $ret;
 	}
 
-	
-
 	/* per fissare io messaggio da mostrare al caricamento della pagina
 	 */
 	public static function mem($tpl=false){
@@ -35,11 +30,6 @@ class utility{
 			$template
 		);
 	}
-	
-
-
-
-
 	/**
 	 *  Get caller info of the function who invokes gat_caller
 	 *
@@ -58,8 +48,6 @@ class utility{
 			'line'=>$caller['line']
 		);
 	}
-
-
 	
 	/**
 	 * Return a complete <select> html tag
@@ -74,9 +62,6 @@ class utility{
 	 *
 	 */
 	public static function get_combo($keys, $vals, $opt=array(), $selected='', $first=FALSE, $optgroup=FALSE, $k_v='vals') {
-		
-		
-		
 		$optgrouped = (is_array($optgroup) && count($optgroup)>0 );
 		$group = $optgrouped ? current($optgroup) : false;
 		
@@ -85,32 +70,22 @@ class utility{
 		$ret.='>';
 		if ($first)$ret.='<option value="">- ' . $first . ' -</option>';
 		
-		
-		
-		
 		for ($i = 0, $len = count($keys); $i < $len; $i++) {
-			
-			
 			if($optgrouped && $i>0 && $optgroup[$keys[$i]] != $group){
 				$ret .= '</optgroup>';
 			}
 			if($optgrouped && ($i==0 || $optgroup[$keys[$i]] != $group) ){
 				$ret .= '<optgroup label="'.$optgroup[$keys[$i]].'">';
 			}
-			
-			
 			$ret .= '<option value="' . $keys[$i] . '" '.(($selected == ${$k_v}[$i]) ? ' selected="selected" ' : '' ) . ' >' . $vals[$i] . '</option>';
 			
 			if($optgrouped){
 				$group = $optgroup[$keys[$i]];
 			}
-			
-			
 		}
 		$ret.='</select>';
 		return $ret;
 	}
-
 
 	/**
 	 * Clean this copy of invalid non ASCII √§√≥characters
@@ -120,7 +95,6 @@ class utility{
 	public static function clean_non_ascii($str){
 		return preg_replace('/[^(\x20-\x7F)]*/','', $str);
 	}
-
 
 	/**
 	 *	get backtrace call
@@ -145,13 +119,10 @@ class utility{
 		return array($file, $line, $func);
 	}
 
-
 	public static function microtime_float() {
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float) $usec + (float) $sec);
 	}
-
-
 
 	public static function print_d($var, $out = FALSE, $label=FALSE) {
 		$ret = '<pre style="color:#DF0000; border:1px dotted red; background-color:#ffff00; padding:10px;">';
@@ -180,8 +151,6 @@ class utility{
 		}
 	}
 
-
-
 	/*
 	 * prints call stack
 	 *
@@ -191,8 +160,6 @@ class utility{
 		debug_print_backtrace();
 		echo '</pre>';
 	}
-
-
 
 	/**
 	 * uses tinyurl service to recude a url
@@ -206,17 +173,12 @@ class utility{
 		curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url);
 		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
-		
-		
 		curl_setopt($ch,CURLOPT_ENCODING , "gzip");
-		
 		$data = curl_exec($ch);
 		curl_close($ch);
 		return $data;
 	}
 
-	
-	
 	/*
 	 * 
 	 * 
@@ -239,17 +201,12 @@ class utility{
 	
 	//funzione usata nelle funzioni pack
     public static function md5time($file){
-
 		return md5( date ("F d Y H:i:s.", filemtime($file)) );
 	}
-	
-	
 	
 	public static function validUrl($ret){
 		return preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $url);
 	}
-	
-	
 	
 	/**
 	 * Validate an email address.
@@ -259,9 +216,9 @@ class utility{
 	 */
 	 public static function validEmail($email){
 		 $atIndex = strrpos($email, "@");
-		 if (is_bool($atIndex) && !$atIndex){
+		 if (is_bool($atIndex) && !$atIndex) {
 			 return false;
-		}else{
+		} else {
 			$domain = substr($email, $atIndex+1);
 			$local = substr($email, 0, $atIndex);
 			$localLen = strlen($local);
@@ -301,7 +258,6 @@ class utility{
 					}
 				break;
 			}
-			
 			if ($isValid && !(checkdnsrr($domain,"MX") || checkdnsrr($domain,"A"))){
 				// domain not found in DNS
 				return false;
@@ -315,23 +271,17 @@ class utility{
 	}
 	*/
 	public static function hl_code($is_php =true){
-		
 		static $on=false;
 		if (!$on) ob_start();
-		else{
+		else {
 			$out = ob_get_contents();
 			$buffer= ($is_php?"<?php \n":"").$out.($is_php?" ":"").($is_php?"\n":"");
 			ob_end_clean();
-			
 			highlight_string($buffer);
-		
 		}
 		$on=!$on;		
 	}
-	
-	
-	
-	
+
 	public static function is_keyword($keyword){
 		$kw = array(
 			'abstract','and','array', 'as', 'break', 'case', 'catch', 'cfunction', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'do',
@@ -342,9 +292,6 @@ class utility{
 		return in_array($keyword, $kw);		
 	}
 	
-	
-	
-	
 	/**
 	* Check a string of base64 encoded data to make sure it has actually
 	* been encoded.
@@ -354,12 +301,9 @@ class utility{
 	* base64 characters; returns false if there is even one non-base64 character.
 	*/
 	public static function checkBase64Encoded($encodedString) {
-		
 		$length = strlen($encodedString);
-		
 		// Check every character.
 		for ($i = 0; $i < $length; ++$i) {
-			
 			$c = $encodedString[$i];
 			if (
 				($c < '0' || $c > '9') &&
@@ -377,16 +321,11 @@ class utility{
 		return true;
 	}
 	
-	
 	public static function swehtml($input) {
 	 	return str_replace(
-	 		array("Ã¥",		"Ã¤",	"Ã¶",	"Ã…",	"Ã„",	"Ã–",	'Ã¼',	'ÃŸ',	'Ãœ',	'Ã©',	'Ã£',	'Â©'),
-	 		array("å",		"ä",	"ö",	"Å",	"Ä",	"Ö",	'ü',	'ß',	'Ü',	'é',	'ã',	'©'),
+	 		array("Ã¥",	"Ã¤", "Ã¶", "Ã…", "Ã„", "Ã–", 'Ã¼', 'ÃŸ', 'Ãœ', 'Ã©', 'Ã£', 'Â©'),
+    		array("å", "ä", "ö", "Å", "Ä", "Ö", 'ü', 'ß', 'Ü', 'é', 'ã', '©'),
 	 		$input
 	 	);
-	} 
-
-	
-	
-	
+	}
 }

@@ -52,13 +52,6 @@ class arr{
 		return $arr;
 	}
 
-/*
-	public function arr2attr($arr) {
-		$att ='';
-		if(is_array($arr)) foreach($arr as $k => $v)	$att.= ' '.$k.'="'.$v.'"';
-		return $att;
-	}
-*/
 	public static function arr2attr($arr, $noQuot=false){
 		$ret = '';
 		if (is_array($arr) && count($arr) > 0) {
@@ -68,20 +61,15 @@ class arr{
 		return $ret;
 	}
 	
-	
-	
 	/**
 	 *
 	 * 	Se viene passato $md a TRUE allora tutti i valori in get vengono md5izzati,
 	 * 	questo per rendere molto difficile che un uente metta in blacklist un altro utente tramite url)
 	 */
 	public static function arr2get($par=null, $md = FALSE) {
-
 		if( !is_null($par) ){
-
 		    $params = '';
 		    $i = 0;
-
 		    foreach ($par as $k => $p) {
 				$val = ($md) ? md5($p) : $p;
 				$params.= ( ($i == 0) ? '?' : '&') . "$k=$val";
@@ -105,7 +93,7 @@ class arr{
 	 */
 
 	public static function array_not_empty($arr){
-		return ( is_array($arr) && count($arr)>0 );
+		return is_array($arr) && count($arr) > 0;
 	}
 
 	/**
@@ -116,7 +104,7 @@ class arr{
 	 */
 
 	public static function array_empty($arr){
-		return ( is_array($arr) && count($arr)==0 );
+		return is_array($arr) && count($arr)==0 ;
 	}
 	
 	
@@ -247,8 +235,8 @@ class arr{
 
 
 
-		/**
-	  Partiziona un doppio array associativo secondo una chiave
+	/**
+	 * Partiziona un doppio array associativo secondo una chiave
 	 */
 	public static function array_partition($arr=null, $key=false) {
 
@@ -305,6 +293,4 @@ class arr{
 		foreach($arr as $el)$res[$el[$key]] = $el;
 		return $res;
 	}
-
-
 }

@@ -1,3 +1,3 @@
 <?php
 
-echo '<h1>System '.$name.'</h1>';
+echo '<h1>System default '.$name.'</h1>';
