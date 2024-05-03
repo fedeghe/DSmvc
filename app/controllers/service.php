@@ -2,6 +2,9 @@
 
 class service extends Controller{
 
+	public function action_index(){
+		echo __FILE__;
+	}
 	public function action_getUsers(){
 
 		$a = func_get_args();

@@ -2,7 +2,6 @@
 class Dispatcher{
 
 	public static function dispatch() {
-
 		ob_start();
 		
 		// maybe we can jump

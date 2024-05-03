@@ -56,6 +56,7 @@ FileETag MTime Size
     # comment RewriteBase for go in localhost
     RewriteBase /
 
-    RewriteRule   (.*) htdocs/$1 [L,QSA]
+    RewriteRule   (.*) /htdocs/$1 [L,QSA]
+
 </IfModule>
 

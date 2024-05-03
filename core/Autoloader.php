@@ -1,4 +1,5 @@
 <?php
+
 //include_path file
 include(PATH_CONFIG.'include_path.php');
 
@@ -20,15 +21,15 @@ class Autoloader {
 	}
 }
 
+error_reporting(8191);
+
 
 // specify parameters for autoloading classes
-spl_autoload_register(NULL, FALSE);
+// spl_autoload_register(NULL, FALSE);
 
 spl_autoload_extensions('.php');
 
-spl_autoload_register(array('Autoloader', 'load'));
-
-error_reporting(8191);
+spl_autoload_register(__NAMESPACE__ .'\Autoloader::load');
 
 
 

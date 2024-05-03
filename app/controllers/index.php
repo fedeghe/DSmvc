@@ -16,6 +16,7 @@ class index extends Controller{
         );
 
         $places = Places::getAll();
+    
 
         $v->data = utility::print_d($places, true);
 

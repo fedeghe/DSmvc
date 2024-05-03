@@ -3,11 +3,8 @@
 defined('DSMVC') OR die('No direct access allowed!');
 
 class mydb extends db{ 
-
 	private $pars;
-	
 	private static $instance = NULL;
-
 	public function __construct($location = false){
 
 		$loc = $location ? $location : DB;
@@ -17,7 +14,7 @@ class mydb extends db{
 				$this->pars = array(
 					'user' => 'root',
 					'pwd' => 'maremma',
-					'host' => '127.0.0.1',
+					'host' => 'localhost',
 					'db' => 'wavescores'
 				);
 			break;

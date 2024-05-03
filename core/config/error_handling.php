@@ -3,7 +3,9 @@
 error_reporting(0);
 
 // user defined error handling function
-function userErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
+function userErrorHandler($errno, $errmsg, $filename, $linenum
+//, $vars
+)
 {
 
     ob_start();
@@ -15,8 +17,8 @@ function userErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
             "\n\n---ERRNO---\n" . print_r($errno, true) .
             "\n\n---ERRSTR---\n" . print_r($errmsg, true) .
             "\n\n---ERRFILE---\n" . print_r($filename, true) .
-            "\n\n---ERRLINE---\n" . print_r($linenum, true) .
-            "\n\n---ERRCONTEXT---\n" . print_r($vars, true);
+            "\n\n---ERRLINE---\n" . print_r($linenum, true);
+            // ."\n\n---ERRCONTEXT---\n" . print_r($vars, true);
 
         $styles = array(
             'common' => array(

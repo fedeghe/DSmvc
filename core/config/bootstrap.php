@@ -1,7 +1,9 @@
 <?php
+
 mb_internal_encoding('UTF-8');
 mb_http_output('UTF-8');
-mb_http_input('UTF-8');
+
+// mb_http_input('UTF-8');
 mb_language('uni');
 mb_regex_encoding('UTF-8');
 
@@ -19,6 +21,7 @@ $SERVER_NAME = $_SERVER['SERVER_NAME'];
 // defines
 include('define.php');
 
+
 // lang set
 include('langset.php');
 
@@ -35,7 +38,6 @@ function microtime_float() {
  *  Deep clean for POST, GET, COOKIE, REQUEST
  */
 function deep_slashes($value) {
-    
     switch(true){
         case is_array($value):
             $value = array_map('deep_slashes', $value);
@@ -46,8 +48,8 @@ function deep_slashes($value) {
                 $value->{$key} = stripslashes_deep( $data );
             }
         break;
-        default:
-            $value = @mysql_real_escape_string( $value );
+        // default:
+        //     $value = mysqli::real_escape_string( $value );
         break;
     }
     return $value;

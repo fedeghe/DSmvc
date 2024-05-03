@@ -12,6 +12,7 @@ defined('ON_DOMAIN') || define('ON_DOMAIN', true);
 defined('ONLINE') || define('ONLINE', true);
 
 defined('DB') || define('DB', 'local');
+defined('PORT') || define('PORT', $_SERVER['SERVER_PORT']);
 
 
 
@@ -43,7 +44,7 @@ defined('AUTO_PARSE') || define('AUTO_PARSE', true);
 defined('PROTOCOL') || define('PROTOCOL', 'http' . (((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] == 'on')) ? 's' : ''));
 defined('LOCAL_FOLDER') || define('LOCAL_FOLDER', ON_DOMAIN ? '' : basename(dirname(dirname(dirname(__FILE__)))));
 defined('BASE_FOLDER') || define('BASE_FOLDER', ON_DOMAIN ? '' :  LOCAL_FOLDER . US);
-defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $SERVER_NAME . US);
+defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $SERVER_NAME . (PORT ? ':'.PORT : ''). US);
 defined('URL_BASE') || define('URL_BASE', URL_ROOT . BASE_FOLDER);
 defined('URL_COMPLETE') || define('URL_COMPLETE', $REQUEST_URI);
 defined('URL') || define('URL', parse_url($REQUEST_URI)['path']);
@@ -56,6 +57,6 @@ defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');
 //  activate to pick up labels and get files for lang
 defined('CUMULATE_LANG') || define('CUMULATE_LANG', true);
 
-defined('ERROR_LEVEL') || define('ERROR_LEVEL', 1/* 2<<13 -1 */);
+defined('ERROR_LEVEL') || define('ERROR_LEVEL',  2<<13 -1 );
 defined('ERROR_VISIBLE') || define('ERROR_VISIBLE', true);
 defined('STACKTRACE_ENABLED') || define('STACKTRACE_ENABLED', true);

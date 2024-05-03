@@ -11,6 +11,7 @@ class Cache{
 	private static $ext = '.html';
 
 	public static function check() {
+		
 		$id = md5(URL);
 		if (self::valid($id)) {
 			echo self::get($id);
