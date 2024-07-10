@@ -2,6 +2,7 @@
 class Places {
 	public static function getAll() {
 		$db = mydb::getInstance();
+        if(!$db) return Array();
 		$res = $db->query("
 			SELECT ? FROM `?`
 		", array(

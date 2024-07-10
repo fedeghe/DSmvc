@@ -15,10 +15,9 @@ class index extends Controller{
             'fk_group' => 2
         );
 
-        $places = Places::getAll();
-    
-
-        $v->data = utility::print_d($places, true);
+        // only if the trial db is set
+        // $places = Places::getAll();
+        // $v->data = utility::print_d($places, true);
 
         Response::send($v->display());
     }

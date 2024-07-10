@@ -1,27 +1,31 @@
+<?php
+	$out = str_repeat('<li>&bull;</li>', 27);
+	if (isSet($nome)) {
+		$out='';
+		$a = str_split($nome);
+		foreach($a as $char)$out.='<li>'.$char.'</li>';
+	}
+?>
 <!DOCTYPE html>
 <html>
 	<head>
-		<?php echo $head; ?>{{prova}}
-		<?php
-			$out = str_repeat('<li>&bull;</li>', 27);
-			if (isSet($nome)) {
-				$out='';
-				$a = str_split($nome);
-				foreach($a as $char)$out.='<li>'.$char.'</li>';
-			}
-		?>
+		<?php echo $head; ?>
 	</head>
 	<body>
+		{{prova}}
 		<div id="item">
             <ul><?php echo $out; ?></ul>
         </div>
-		[[prova &par1=`Foo` &par2=`evenMoreFoo`]]
+		<!-- [[prova &par1=`Foo` &par2=`evenMoreFoo`]]
 		<br>
-		[[xxx &name=`Federico`]]
-		[D[URL_BASE]D]
-		<hr>
-		[T[perche]T] - [T[hello]T]
-		<hr>
-		<?php echo $data; ?> 
+		[[xxx &name=`Federico`]] -->
+	
+		<footer>
+			<span>[D[URL_BASE]D]</span>
+			
+			<span>[T[perche]T] - [T[hello]T]</span>
+			<!-- <hr> -->
+			<!-- <?php echo $data; ?>  -->
+		</footer>
 	</body>
 </html>

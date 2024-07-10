@@ -4,6 +4,7 @@
 	margin:0 auto;
 	top:300px;
 	position: relative;
+	left:200px;
 	/*border:1px solid white;*/
 }
 ul{
@@ -19,4 +20,23 @@ body{
 li{
 	text-align:center;
 	display:none;
+}
+.title{
+	color:red;
+	text-align: center;
+}
+
+footer{
+	border-top:1px solid #0f0;
+	display:flex;
+	justify-content: space-between;
+	flex-direction: row;
+	position: absolute;
+	bottom:10px;
+	width:100%;
+	
+}
+footer div {
+	flex:1;
+	padding:0 10px;
 }
