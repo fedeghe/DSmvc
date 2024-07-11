@@ -16,6 +16,8 @@ body{
 	font-family: Arial, "MS Trebuchet", sans-serif;
 	font-weight: bold;
 	font-size:1em;
+	padding:0px;
+	margin:0px;
 }
 li{
 	text-align:center;
