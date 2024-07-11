@@ -1,7 +1,7 @@
 <?php
 $trans = array(
 	"hallo" => "hallo",
-	"hello" => "good morning",
+	"hello" => "hello",
 	"perche" => "why",
 	"php" => "php",
 );
