@@ -48,6 +48,13 @@ defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $SERVER_NAM
 defined('URL_BASE') || define('URL_BASE', URL_ROOT . BASE_FOLDER);
 defined('URL_COMPLETE') || define('URL_COMPLETE', $REQUEST_URI);
 defined('URL') || define('URL', parse_url($REQUEST_URI)['path']);
+defined('FULL_URL') ||
+    define(
+        'FULL_URL', 
+        "http".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "s": "")."://"
+        .$_SERVER['HTTP_HOST']
+        .(strlen($_SERVER['REQUEST_URI']) > 1 ? $_SERVER['REQUEST_URI'] : '')   
+    );
 
 defined('PATH_JS') || define('PATH_JS', PATH_ROOT . 'htdocs' . DS . 'js' . DS);
 defined('PATH_CSS') || define('PATH_CSS', PATH_ROOT . 'htdocs' . DS . 'css' . DS);
