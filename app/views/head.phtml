@@ -1,34 +1,3 @@
 <meta charset="UTF-8">
 <title>[$title$]</title>
 {C{css/style.css}C}
-{J{js/jquery-1.4.2.min.js}J}
-<script>JMVCshut = true;</script>
-{J{js/3dEngine.js}J}
-{J{js/objs/sphere.js}J}
-{J{js/Threede/Threede.js}J}
-<script>
-	jQuery(
-		function() {
-			var camera = new Camera3D(),
-				item = new Object3D($("#item")),
-				scene = new Scene3D();
-
-			item.addChild(new Sphere(150));
-			camera.init(0,0,0,200);
-			scene.addToScene(item);
-			
-			var animateIt = function(){
-				axisRotation.y += .01;
-				axisRotation.x += .002;
-				axisRotation.z += .02;
-
-				scene.renderCamera(camera);
-			};
-
-			setInterval(animateIt, 20);
-
-			jQuery('li').fadeIn();
-		}
-	);
-
-</script>
