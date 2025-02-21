@@ -8,9 +8,10 @@ class db{
 	private $time;
 	private $tmp_start, $tmp_end;
 	private static $instance;
-	public static function get_instance(){
-		if(!isSet(self::$instance)){
-			self::$instance = new self();
+
+	public static function getInstance(){
+		if(is_null(self::$instance)){
+			self::$instance = new static();
 		}
 		return self::$instance;
 	}
@@ -27,7 +28,13 @@ class db{
 	}
 
 	protected function connect($c){
-		$this->db = @mysqli_connect($c['host'],$c['user'],$c['pwd']);
+		$this->db = mysqli_connect(
+			$c['host'],
+			$c['user'],
+			$c['pwd']
+			,$c['db']
+			// ,$c['port']
+		);
 		@mysqli_select_db($this->db, $c['db']);
 	}
 
@@ -200,7 +207,7 @@ class db{
 		$this->query('START TRANSACTION;');
 		//flag riuscita
 		$ret= TRUE;
-		$log  = factory::get('log');
+		$log  = Factory::get('log');
 
 		foreach ($queries as $q) {
 			if ($ret) {

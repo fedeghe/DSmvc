@@ -5,6 +5,7 @@
 	top:300px;
 	position: relative;
 	left:200px;
+	user-select: none;
 	/*border:1px solid white;*/
 }
 ul{

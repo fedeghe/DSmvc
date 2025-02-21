@@ -15,7 +15,9 @@ class Controller{
 	public function __call ($name, $arguments) {
 		$bt = debug_backtrace();
 		$controller = $bt[1]['class'];
-		echo '<u><b>'.$name.'</b></u> action <b>NOT FOUND</b> in '.__CLASS__.' <b>'.$controller.'</b>';
+		// echo '<u><b>'.$name.'</b></u> action <b>NOT FOUND</b> in '.__CLASS__.' <b>'.$controller.'</b>';
+		header('Location:'.URL_BASE);
+
 	}
 
 

@@ -36,8 +36,6 @@ class Dispatcher{
 		DSMVC::$controller = preg_replace(URL_EXT, '', $controller);
 		DSMVC::$action = preg_replace(URL_EXT, '', $action);
 
-		//  debug(DSMVC::$controller);
-		// debug(DSMVC::$action);
 
 		// create controller instance and call the specified action
 		try {
@@ -46,10 +44,13 @@ class Dispatcher{
 			
 		}catch(Exception $e) {
 			if (defined('CONTROLLER404')) {
+				// debug(CONTROLLER404);
 				DSMVC::$controller = CONTROLLER404;
 				DSMVC::$action = 'index';
 			} else {
 				die("Controller `$controller.php` not found");
+				// sleep(3);
+				// header('Location:'.URL_BASE);
 			}
 		}
 

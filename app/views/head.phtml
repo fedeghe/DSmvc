@@ -5,7 +5,8 @@
 <script>JMVCshut = true;</script>
 {J{js/3dEngine.js}J}
 {J{js/objs/sphere.js}J}
-{J{js/Threede/Threede.js}J}
+{J{js/objs/cube.js}J}
+
 <script>
 	jQuery(
 		function() {
@@ -13,8 +14,8 @@
 				item = new Object3D($("#item")),
 				scene = new Scene3D();
 
-			item.addChild(new Sphere(150));
-			camera.init(0,0,0,200);
+			item.addChild(new Sphere(100));
+			camera.init(0,0,0,280);
 			scene.addToScene(item);
 			
 			var animateIt = function(){

@@ -6,7 +6,7 @@ class Request{
 	private function __construct () {}
 	
 	public static function handle ($controller, $action, $arg = NULL, $url) {
-
+		// $found = false;
 		$params = array();
 		preg_match('/^action_(.*)/', $action, $matches);
 		$actionName = $matches[1];
@@ -38,7 +38,9 @@ class Request{
 		
 
 		// call before
-		self::$_controllerInstance[$controller]->before();
+		if (method_exists(self::$_controllerInstance[$controller], 'before')) {
+			self::$_controllerInstance[$controller]->before();
+		}
 
 		if (method_exists(self::$_controllerInstance[$controller], 'before_' . $actionName)) {
 
@@ -48,14 +50,14 @@ class Request{
 		//action existance is managed by controller protected __call
 		self::$_controllerInstance[$controller]->$action($params, $url, $controller, $action);
 
-
 		if (method_exists(self::$_controllerInstance[$controller], 'after_' . $actionName)) {
-
 			call_user_func_array(array(self::$_controllerInstance[$controller], 'after_'.$actionName), $params);
 		}
 
-		// call after
-		self::$_controllerInstance[$controller]->after();
+		if (method_exists(self::$_controllerInstance[$controller], 'after')) {
+			self::$_controllerInstance[$controller]->after();
+		}
+		// if(!$found) header('Location:' .URL_BASE);
 		return true;
 	}
 

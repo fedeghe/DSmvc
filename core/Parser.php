@@ -15,7 +15,6 @@
  *	[G[]G]		get
  *	{{}}		chunks
  *	[[]]		snippet
- *	[[]]		snippet
  *	{J{}J}
  *	{C{}JC}
  *	[T[]T]		translation
@@ -52,16 +51,16 @@ class Parser
             'sessV'    => array('preg' => '!\[S\[' . $base . '\]S\]!Uis',            'params' => array('pre' => '[S[', 'post' => ']S]')),
             'postV'    => array('preg' => '!\[P\[' . $base . '\]P\]!Uis',            'params' => array('pre' => '[P[', 'post' => ']P]')),
             'getV'    => array('preg' => '!\[G\[' . $base . '\]G\]!Uis',            'params' => array('pre' => '[G[', 'post' => ']G]')),
-            'chu'    => array('preg' => '!\{\{' . $base . '\}\}!Uis',            'params' => array('pre' => '{{', 'post' => '}}')),
-            'sniNP'    => array('preg' => '!\[\[' . $base . '\]\]!Uis',            'params' => array('pre' => '[[', 'post' => ']]')),
-            'sniP'    => array('preg' => '!\[\[' . $base . '\s?[&](.*)\]\]!Uis',    'params' => array('pre' => '[[', 'post' => ']]')),
+            'chu'    => array('preg' => '!\{\{' . $file . '\}\}!Uis',            'params' => array('pre' => '{{', 'post' => '}}')),
+            'sniNP'    => array('preg' => '!\[\[' . $file . '\]\]!Uis',            'params' => array('pre' => '[[', 'post' => ']]')),
+            'sniP'    => array('preg' => '!\[\[' . $file . '\s?[&](.*)\]\]!Uis',    'params' => array('pre' => '[[', 'post' => ']]')),
 
             'js'    => array('preg' => '!\{J\{' . $file . '\}J\}!Uis',            'params' => array('path' => PATH_JS, 'pre' => '{J{', 'post' => '}J}')),
             'css'    => array('preg' => '!\{C\{' . $file . '\}C\}!Uis',            'params' => array('path' => PATH_CSS, 'pre' => '{C{', 'post' => '}C}')),
 
             'view'        => array('preg' => '!\[V\[' . $file . '(\s[&](.*))?\]V\]!Uis',    'params' => array('pre' => '[V[', 'post' => ']V]')),
 
-            'trans_soft' => array('preg' => '!\[t\[' . $lng . '\]t]!Us',            'params' => array('pre' => '[t[', 'post' => ']t]')),
+            'trans_soft' => array('preg' => '!\[t\[' . $lng . '\]t]!Uis',            'params' => array('pre' => '[t[', 'post' => ']t]')),
 
             'trans'    => array('preg' => '!\[T\[' . $lng . '\]T]!Uis',            'params' => array('pre' => '[T[', 'post' => ']T]')),
             'php'    => array('preg' => '!\[\[php\s' . $min . '::(.*)\]\]!Uis', 'params' => array('pre' => '[[php ', 'post' => ']]'))
@@ -176,8 +175,7 @@ class Parser
     /**
      * parse [$variable$]
      */
-    private function get_Tvars($out, $params)
-    {
+    private function get_Tvars($out, $params){
         extract($this->variables);
         $pre = $params['pre'];
         $post = $params['post'];
@@ -189,16 +187,14 @@ class Parser
     /**
      * parse [D[defined_variables]D]<?php echo '
      */
-    private function get_defV($out, $params)
-    {
+    private function get_defV($out, $params){
         $pre = $params['pre'];
         $post = $params['post'];
         foreach ($out[1] as $k => $val)
             $this->content = str_replace($pre . $val . $post, defined($val) ? constant($val) : '', $this->content);
     }
 
-    private function get_view($out, $params)
-    {
+    private function get_view($out, $params){
 
         foreach ($out[1] as $k => $val) {
             ob_start();
@@ -217,8 +213,7 @@ class Parser
     /**
      * parse {{chunks}}
      */
-    private function get_chu($out, $params)
-    {
+    private function get_chu($out, $params){
         $pre = $params['pre'];
         $post = $params['post'];
         foreach ($out[1] as $k => $val) {
@@ -239,8 +234,7 @@ class Parser
     /**
      * parse [[snippet]]
      */
-    private function get_sniNP($out, $params)
-    {
+    private function get_sniNP($out, $params){
         $pre = $params['pre'];
         $post = $params['post'];
         foreach ($out[1] as $k => $snipp) {
@@ -270,8 +264,7 @@ class Parser
     /**
      * parse [[snippet &par1=`val1`&par2=`val2`]]
      */
-    private function get_sniP($out, $params)
-    {
+    private function get_sniP($out, $params){
 
         for ($i = 0; $i < count($out[0]); $i++) {
             //0 match completo
@@ -313,8 +306,7 @@ class Parser
     /**
      * parse for session vars [S[xxx]S]
      */
-    private function get_sessV($out, $params)
-    {
+    private function get_sessV($out, $params){
         foreach ($out[1] as $k => $val)
             $this->content = str_replace(
                 $params['pre'] . $val . $params['post'],
@@ -325,8 +317,7 @@ class Parser
     /**
      * parse for get vars [G[xxx]G]
      */
-    private function get_getV($out, $params)
-    {
+    private function get_getV($out, $params){
         foreach ($out[1] as $k => $val)
             $this->content = str_replace(
                 $params['pre'] . $val . $params['post'],
@@ -340,8 +331,7 @@ class Parser
     /**
      * parse for post vars [P[xxx]P]
      */
-    private function get_postV($out, $params)
-    {
+    private function get_postV($out, $params){
         foreach ($out[1] as $k => $val)
             $this->content = str_replace(
                 $params['pre'] . $val . $params['post'],
@@ -350,8 +340,7 @@ class Parser
             );
     }
 
-    private function get_js($out, $params)
-    {
+    private function get_js($out, $params){
         foreach ($out[1] as $k => $val) {
             if (file_exists(BASE_FOLDER . $val)) {
                 $this->content = str_replace(
@@ -363,8 +352,7 @@ class Parser
         }
     }
 
-    private function get_css($out, $params)
-    {
+    private function get_css($out, $params){
         foreach ($out[1] as $k => $val) {
             if (file_exists(BASE_FOLDER . $val)) {
                 $this->content = str_replace(
@@ -376,14 +364,11 @@ class Parser
         }
     }
 
-    private function get_trans_soft($out, $params)
-    {
-
+    private function get_trans_soft($out, $params){
         $this->get_trans($out, $params, true);
     }
 
-    private function get_trans($out, $params, $soft = FALSE)
-    {
+    private function get_trans($out, $params, $soft = FALSE){
 
         $dest_lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : DEFAULT_LANG;
 
@@ -395,6 +380,7 @@ class Parser
         $pre = $params['pre'];
         $post = $params['post'];
 
+        // echo PATH_TRANSLATIONS . $dest_lang . '.php';
         foreach ($out[1] as $k => $val) {
             // copy for editing
             $label = $val;
@@ -410,6 +396,7 @@ class Parser
                 if ($exists) {
                     include(PATH_TRANSLATIONS . $dest_lang . '.php');
                     $transL = $trans;
+                    // debug($trans);
                 }
 
                 // that reduce usage, in fact cannot use in a attribute like a title or a alt
@@ -418,6 +405,7 @@ class Parser
                     : ($soft ?  $label : '<i class="untranslated" title="not translated">' . $label . '</i>');
             } else {
 
+                // debug($trans);
                 // same here
                 $x = (isset($trans[$label]) && $trans[$label] != $label) ?
                     $trans[$label]
@@ -434,13 +422,7 @@ class Parser
         }
     }
 
-
-
-
-
-
-    public function view_stats()
-    {
+    public function view_stats(){
         echo '<h3>' . __CLASS__ . ': ' . $_anti_recursion_counter . '</h3>';
     }
 }// end class

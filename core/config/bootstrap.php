@@ -10,10 +10,14 @@ ini_set('pcre.backtrack_limit', '4M' );
 
 date_default_timezone_set(date_default_timezone_get());
 
+// print_r($_GET, true);
+
 session_start();
 $REQUEST_URI = $_SERVER['REQUEST_URI'];
 $SERVER_NAME = $_SERVER['SERVER_NAME'];
+
 // defines
+include('auth_define.php');
 include('define.php');
 // lang set
 include('langset.php');
