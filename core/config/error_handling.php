@@ -3,11 +3,7 @@
 error_reporting(0);
 
 // user defined error handling function
-function userErrorHandler($errno, $errmsg, $filename, $linenum
-//, $vars
-)
-{
-
+function userErrorHandler($errno, $errmsg, $filename, $linenum /*, $vars*/){
     ob_start();
     $err_level =  2 << ERROR_LEVEL - 1;
 
@@ -59,7 +55,7 @@ function userErrorHandler($errno, $errmsg, $filename, $linenum
 
     DSMVC::$errors = ob_get_clean();
 
-    //if(DSMVC::$errors) error_log(DSMVC::$errors, 3, "../php_errors.log");
+    // if(DSMVC::$errors) error_log(DSMVC::$errors, 3, "../php_errors.log");
     if (DSMVC::$errors) {
         echo DSMVC::$errors;
     }

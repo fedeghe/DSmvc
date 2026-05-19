@@ -7,7 +7,7 @@ class utility{
 	 * @param all $arr
 	 */
 	public static function pd($arr=false, $out = false){
-		$tmp = '<pre style="-moz-border-radius-bottomright:15px;-moz-border-radius-topright:15px;color:#00ff00;padding:10px;border:1px dashed red; border-left:5px solid red;margin:5px;background-color:#333333">'.print_r($arr, true).'</pre>';
+		$tmp = '<pre style="border-bottom-right-radius:15px;border-top-right-radius:15px;color:#00ff00;padding:10px;border:1px dashed red; border-left:5px solid red;margin:5px;background-color:#333333;width:fit-content;">'.print_r($arr, true).'</pre>';
 		if(!$out){echo $tmp;}
 		else{return $tmp;}
 	}

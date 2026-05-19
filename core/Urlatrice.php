@@ -20,57 +20,96 @@ function getLocation($ip) {
 // https://urlo.com:8890/m/epYduWFd/1
 // https://urlo.com:8890/m/47DEQpj8/1
 
+
+function isTrackable($userAgent) {
+	$r = true;
+    $black_list = array(
+      "whatsapp",
+      "facebot",
+      "twitterbot"
+    );
+	foreach ($black_list as $value) {
+		$r = $r & (stripos($userAgent, $value) === false);
+	}
+    return $r;
+}
+
+
 class urlatrice{
 	private $db;
 
 	public function __construct(){
 		$this->db = Factory::get('mydb');
 	}
-	
+
+	private $black_list = array(
+		"whatsapp",
+		"facebot",
+		"twitterbot"
+	  );
+
+	private function isTrackable($userAgent) {
+		$r = true;
+		foreach ($this->black_list as $value) {
+			$r = $r & (stripos($userAgent, $value) === false);
+		}
+		return $r;
+	}
+
+	private function justAdded($linkId, $userAgent, $ip) {
+		$result = $this->db->query('
+			SELECT COUNT(*) as count
+			FROM `stats`
+			WHERE fkLink = ?
+			  AND userAgent = ?
+			  AND ip = ?
+			  AND date >= NOW() - INTERVAL ? MINUTE
+		', array($linkId, $userAgent, $ip, DEBOUNCE_MINUTES));
+
+		$row = $this->db->fetch_assoc($result);
+		return $row['count'] > 0;
+	}
 
 	public function set($userId, $targetId, $alias, $type){
-
 		// first get the target url
-		
 		$r = $this->db->query('
 			SELECT *
-			FROM `?`
+			FROM `targets`
 			WHERE id = ? AND fkUser = ?;
 		',array(
-			'targets',
 			$targetId,
 			$userId,
 		));
 		$target = $this->db->fetch_row($r);
 		// utility::print_d($target, true);
-		
+
 		if(is_array($target)){
 			$urlHash = getHash($target['url'].rand());
 			// check one is not already there
 			$already = $this->db->fetch_assoc(
 				$this->db->query('
 				   SELECT *
-					 FROM `?`
+					 FROM `shorts`
 					WHERE fkTarget = ?
 					  AND fkUser = ?
-					  AND alias = "?"
-					  AND type="'.$type.'";
+					  AND alias = ?
+					  AND type=?;
 				',array(
-					'shorts',
 					$targetId,
 					$userId,
 					$alias,
+					$type,
 				))
-				);
+			);
+
 			if(!is_array($already)){
 				//we can create it
 				$this->db->query('
 						INSERT IGNORE
-						INTO `?`(fkUser, type, urlHash, fkTarget, alias)
-						VALUES(?, "?", "?", "?", "?")
+						INTO `shorts`(fkUser, type, urlHash, fkTarget, alias)
+						VALUES(?, ?, ?, ?, ?)
 					',
 					array(
-						'shorts',
 						$userId,
 						$type,
 						$urlHash,
@@ -85,15 +124,10 @@ class urlatrice{
 		} else {
 			return false;
 		}
-		
+
 	}
 
-
-	public function get($user, $urlHash, $type){
-		$ip = $_SERVER['REMOTE_ADDR'];
-		$details = json_decode(file_get_contents("http://ipinfo.io/{$ip}/json"));
-		$city = $details->city;
-
+	public function resolve($user, $urlHash, $type) {
 		$urlHash = str_replace('`','',$urlHash);
 		$ret = $this->db->query('
 				SELECT `trg`.id,
@@ -102,32 +136,71 @@ class urlatrice{
 				  FROM `shorts` as lnk
 				  JOIN `targets` as trg
 				    ON (lnk.fkTarget = trg.id)
-				 WHERE lnk.fkUser = ? AND lnk.urlHash = "?" AND lnk.active = 1 
-				   AND lnk.type="'.$type.'";
-			',array(
-				$user,
-				$urlHash
-			)
+				 WHERE lnk.fkUser = ?
+				   AND lnk.urlHash = ?
+				   AND lnk.active = 1
+				   AND lnk.type=?;
+			', array($user, $urlHash, $type)
 		);
-
 		$row = $this->db->fetch_assoc($ret);
 
-		if( !isset( $row['url'] ) || trim($row['url']) == ''  ){
+		if (!isset($row['url']) || trim($row['url']) == '') {
 			return false;
 		}
-		$this->db->query('
-			INSERT IGNORE
-			  INTO `?`(fkLink, fkUser, location, userAgent, ip)
-			VALUES (?, ?, "?", "?", "?")
-		', array(
-			'stats',
-			$row['linkId'],
-			$user,
-			$city,
-			$_SERVER['HTTP_USER_AGENT'],
-			$ip
-		));
-		
-		return $row['url'];
+		return array('url' => $row['url'], 'linkId' => $row['linkId']);
+	}
+
+	public function track($linkId, $user) {
+		$ip = $_SERVER['REMOTE_ADDR'];
+		$userAgent = $_SERVER['HTTP_USER_AGENT'];
+		$location = 'local';
+		$latitude = 0;
+		$longitude = 0;
+
+		if (DB_NAME != 'urlo'){
+			if (defined('IP_GEOLOCATION_API_TOKEN')) {
+				$details = json_decode(
+					@file_get_contents("https://api.ipgeolocation.io/v3/ipgeo?apiKey=".IP_GEOLOCATION_API_TOKEN."&ip={$ip}")
+				);
+				if ($details && isset($details->location)) {
+					$location = $details->location->country_name.' | '. $details->location->city;
+					$latitude = $details->location->latitude;
+					$longitude = $details->location->longitude;
+				}
+			} else if(defined('IPINFO_TOKEN')){
+				$details = json_decode(@file_get_contents("https://ipinfo.io/lite/{$ip}?token=".IPINFO_TOKEN));
+				if ($details && isset($details->country)) {
+					$location = $details->country;
+				}
+			}
+		}
+
+		if (
+			$this->isTrackable($userAgent) &&
+			!$this->justAdded($linkId, $userAgent, $ip)
+		){
+			$this->db->query('
+				INSERT IGNORE
+				INTO `stats`(fkLink, fkUser, location, userAgent, ip, lat, lon)
+				VALUES (?, ?, ?, ?, ?, ?, ?)
+			', array(
+				$linkId,
+				$user,
+				$location,
+				$userAgent,
+				$ip,
+				$latitude,
+				$longitude
+			));
+		}
+	}
+
+	public function get($user, $urlHash, $type){
+		$info = $this->resolve($user, $urlHash, $type);
+		if (!$info) {
+			return false;
+		}
+		$this->track($info['linkId'], $user);
+		return $info['url'];
 	}
 }

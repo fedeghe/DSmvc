@@ -1,23 +1,4 @@
 <?php
-defined('APP_NAME') || define('APP_NAME', 'click.jmvc');
-// defined('APP_NAME') || define('APP_NAME', 'l.vitruvianvr');
-
-
-
-
-
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
 
 defined('DSMVC') || define('DSMVC', 1);
 // use a virtual host or a localhost folder ?
@@ -84,5 +65,4 @@ defined('ERROR_LEVEL') || define('ERROR_LEVEL',  2<<13 -1 );
 defined('ERROR_VISIBLE') || define('ERROR_VISIBLE', true);
 defined('STACKTRACE_ENABLED') || define('STACKTRACE_ENABLED', true);
 
-include_once(realpath(dirname(__FILE__) . DS . 'apps'.DS.APP_NAME.'.php'));
 defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');

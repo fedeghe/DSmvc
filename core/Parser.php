@@ -16,7 +16,7 @@
  *	{{}}		chunks
  *	[[]]		snippet
  *	{J{}J}
- *	{C{}JC}
+ *	{C{}C}
  *	[T[]T]		translation
  *
  */
@@ -225,8 +225,8 @@ class Parser
                 case file_exists(PATH_CHU . $val . '.phtml'):
                     include(PATH_CHU . $val . '.phtml');
                     break;
-            }
-            $chu = ob_get_clean();
+                }
+                $chu = ob_get_clean();
             $this->content = str_replace($pre . $val . $post, $chu, $this->content);
         }
     }

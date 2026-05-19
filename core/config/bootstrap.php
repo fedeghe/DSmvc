@@ -15,14 +15,16 @@ date_default_timezone_set(date_default_timezone_get());
 session_start();
 $REQUEST_URI = $_SERVER['REQUEST_URI'];
 $SERVER_NAME = $_SERVER['SERVER_NAME'];
-
 // defines
-include('auth_define.php');
+include(realpath(dirname(__FILE__).'/../../config.php'));
 include('define.php');
+
+
 // lang set
 include('langset.php');
 include_once('error_handling.php');
 include(realpath(dirname(__FILE__).'/../Autoloader.php'));
+Csrf::init();
 
 function debug($a) {
     echo '<pre>'. print_R($a, true) . '</pre>';
@@ -32,7 +34,7 @@ function microtime_float() {
     list($usec, $sec) = explode(" ", microtime());
     return ((float)$usec + (float)$sec);
 }
-//https://stackoverflow.com/questions/1162491/alternative-to-mysql-real-escape-string-without-connecting-to-db
+// https://stackoverflow.com/questions/1162491/alternative-to-mysql-real-escape-string-without-connecting-to-db
 function mres($value){
     $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
     $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");

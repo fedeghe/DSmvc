@@ -52,42 +52,91 @@ class db{
 	}
 
 	/**
-	 *	Perform a query
+	 *	Perform a query using real MySQLi prepared statements
 	 *
-	 * @param <type> $sql
-	 * @param array [$pars] parametres to bind (use ? in $sql)
-	 * @param <type> [$preparsed] set to true if alla parameters need not to be `mysql_real_escape_string`ed
-	 * @param <type> [$debug] set to true to view parsed query
-	 * @return <type>
+	 * @param string $sql
+	 * @param array  $pars      parameters to bind (use ? in $sql)
+	 * @param bool   $preparsed deprecated, kept for compatibility
+	 * @param bool   $debug     set to true to view parsed query
+	 * @param bool   $doit      set to false to skip execution and return true
+	 * @return mixed
 	 */
-	public function query($sql='',$pars = array(), $preparsed = false, $debug=false, $doit=true){
+	public function query($sql='', $pars = array(), $debug=false){
 		$this->t_start();
-		$s = $sql;
-		if (is_array($pars) && count($pars)>0) {
-			$pos = 0;
-			foreach ($pars as $ph => $pv) {
-				$place = strpos($s,"?",$pos);
-				if ($place)
-					$s = substr_replace(
-						$s,
-						$preparsed ? $pv : mysqli_real_escape_string($this->db, $pv),
-						$place,
-						1
-					);
-				$pos = $place;
-			}
-		}
-		
-		if ($debug) echo'<br />Query:'.date('H:i:s').'<br /><strong>'.$s.'</strong><br />--------------------------/<br />';
 
-		if (!$doit) {
+		if ($debug) echo'<br />Query:'.date('H:i:s').'<br /><strong>'.$sql.'</strong><br />Params: '.print_r($pars, true).'<br />--------------------------/<br />';
+
+		if (trim($sql) == '') {
+			$this->t_end();
+			return false;
+		}
+
+		$pars = is_array($pars) ? array_values($pars) : array();
+
+		// No params — simple query for backward compatibility
+		if (count($pars) == 0) {
+			$res = mysqli_query($this->db, $sql);
+			$this->t_end();
+			return $res;
+		}
+
+		$stmt = mysqli_prepare($this->db, $sql);
+		if (!$stmt) {
+			if ($debug) echo 'Prepare failed: '.mysqli_error($this->db).'<br />';
+			$this->t_end();
+			return false;
+		}
+
+		$types = '';
+		$bindValues = array();
+		foreach ($pars as $pv) {
+			if (is_int($pv) || is_bool($pv)) {
+				$types .= 'i';
+				$pv = is_bool($pv) ? ($pv ? 1 : 0) : $pv;
+			} elseif (is_float($pv) || is_double($pv)) {
+				$types .= 'd';
+			} else {
+				$types .= 's';
+			}
+			$bindValues[] = $pv;
+		}
+
+		if (count($bindValues) > 0) {
+			$refs = array();
+			$refs[] = $types;
+			foreach ($bindValues as $key => $value) {
+				$refs[] = &$bindValues[$key];
+			}
+			call_user_func_array(array($stmt, 'bind_param'), $refs);
+		}
+
+		$success = mysqli_stmt_execute($stmt);
+		if (!$success) {
+			if ($debug) echo 'Execute failed: '.mysqli_stmt_error($stmt).'<br />';
+			mysqli_stmt_close($stmt);
+			$this->t_end();
+			return false;
+		}
+
+		$res = mysqli_stmt_get_result($stmt);
+		mysqli_stmt_close($stmt);
+
+		// For INSERT/UPDATE/DELETE get_result returns false, return true on success
+		if ($res === false) {
+			$this->t_end();
 			return true;
 		}
 
-		$res = (trim($s)!='') ? mysqli_query($this->db, $s) : false;
-		// echo $res ? 'true' : 'false';
 		$this->t_end();
-		return $res ;
+		return $res;
+	}
+
+	/**
+	 * Escape a MySQL identifier (table or column name) for safe concatenation.
+	 * Prepared statements cannot bind identifiers, only values.
+	 */
+	public function escape_identifier($identifier) {
+		return '`' . str_replace('`', '``', $identifier) . '`';
 	}
 
 	public function insert_id ($link_identifier=false){
@@ -95,8 +144,8 @@ class db{
 		$res = @mysqli_insert_id($link_identifier ? $link_identifier : $this->db);
 		$this->t_end();
 		return $res ;
-	}	
-	
+	}
+
 	public function affected_rows ($link_identifier=false ){
 		$this->t_start();
 		$res = @mysqli_affected_rows($link_identifier ? $link_identifier : $this->db);
@@ -110,7 +159,7 @@ class db{
 		$this->t_end();
 		return $res ;
 	}
-		
+
 	public function errno($link_identifier=false ){
 		$this->t_start();
 		$res =  @mysqli_errno($link_identifier ? $link_identifier : $this->db);
@@ -138,7 +187,7 @@ class db{
 		$this->t_end();
 		return $res ;
 	}
-	
+
 	public function fetch_all_assoc ($result){
 		$this->t_start();
 		$ret = array();
@@ -170,16 +219,10 @@ class db{
 
 	public function replacecontent($table, $field, $src, $replace, $where){
 		return $this->query(
-			'UPDATE `?`
-				SET ? = REPLACE(?, "?","?")
-			  WHERE ?;
-			',array(
-				$table,
-				$field,
-				$src,
-				$replace,
-				$where
-			)
+			'UPDATE '.$this->escape_identifier($table).'
+				SET '.$this->escape_identifier($field).' = REPLACE('.$this->escape_identifier($field).', ?, ?)
+			  WHERE '.$where.';',
+			array($src, $replace)
 		);
 	}
 
@@ -224,7 +267,7 @@ class db{
 	public function sql2array($sql, $pars = array(), $key=FALSE, $debug=false){
 		return $this->sql2x($sql, $pars, $key, $debug, false);
 	}
-	
+
 	/**
 	*	gli passi un sql e ti restituisce l'array dei risultati
 	*/
@@ -270,25 +313,15 @@ class db{
 		$table_alias = substr($table,0,5);
 		$assoc_alias = substr($assoc,0,5);
 		$query = '
-			SELECT ?.?,
-			       COUNT(?) as ?
-			  FROM `?` as ?
-		 LEFT JOIN `?` as ?
-				ON (?.?=?.?)
-			 WHERE ?
-		  GROUP BY ?
+			SELECT '.$this->escape_identifier($table_alias).'.'.$this->escape_identifier($select_field).',
+			       COUNT('.$this->escape_identifier($assoc_fk).') as '.$this->escape_identifier($count_alias).'
+			  FROM '.$this->escape_identifier($table).' as '.$this->escape_identifier($table_alias).'
+			 LEFT JOIN '.$this->escape_identifier($assoc).' as '.$this->escape_identifier($assoc_alias).'
+				ON ('.$this->escape_identifier($table_alias).'.'.$this->escape_identifier($table_pk).'='.$this->escape_identifier($assoc_alias).'.'.$this->escape_identifier($assoc_fk).')
+			 WHERE '.$where.'
+		  GROUP BY '.$this->escape_identifier($table_pk).'
 		';
-		$res = $this->sql2assoc(
-			$query,
-			array(
-				$table_alias, $select_field,
-				$assoc_fk, $count_alias,
-				$table,	$table_alias,
-				$assoc, $assoc_alias,
-				$table_alias, $table_pk, $assoc_alias, $assoc_fk,
-				$where, $table_pk
-			)
-		);
+		$res = $this->sql2assoc($query);
 
 		return utility::array_makeassoc($res, 'label', 'conta');
 	}
@@ -322,11 +355,14 @@ class db{
 
 
 	public function replace($table, $field, $what, $with){
-		return $this->query('UPDATE ? SET ? = REPLACE(?,"?","?");', array($table, $field, $field, $what, $with));
+		return $this->query(
+			'UPDATE '.$this->escape_identifier($table).' SET '.$this->escape_identifier($field).' = REPLACE('.$this->escape_identifier($field).',?,?);',
+			array($what, $with)
+		);
 	}
-	
+
 	public function optimize_table($table){
-		return $this->query('OPTIMIZE TABLE `?` ',array($table));
-	} 
+		return $this->query('OPTIMIZE TABLE '.$this->escape_identifier($table));
+	}
 }
 
