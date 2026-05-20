@@ -71,7 +71,7 @@ class View {
 			$content = $parser->parse();
 		}
 
-		return $content;		
+		return SHRINK_HTML ? Minifier::minify($content) : $content;		
 	}
 
 
