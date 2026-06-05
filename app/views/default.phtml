@@ -1,9 +1,9 @@
 <?php
-	$out = str_repeat('<li>&bull;</li>', 27);
-	if (isSet($nome)) {
-		$out='';
-		$a = str_split($nome);
-		foreach($a as $char)$out.='<li>'.$char.'</li>';
+	$n = 27;
+	$liClasses = 6;
+	$out = '';
+	for ($i = 0; $i < $n; $i++) {
+		$out .= '<li class="li' . rand(1, $liClasses) . '">&bull;</li>';
 	}
 ?>
 <!DOCTYPE html>
@@ -12,24 +12,8 @@
 		<?php echo $head; ?>
 	</head>
 	<body>
-		<!-- {{prova}} -->
 		<div id="item">
             <ul><?php echo $out; ?></ul>
         </div>
-		<!-- [[prova &par1=`Foo` &par2=`evenMoreFoo`]]
-		<br>
-		[[xxx &name=`Federico`]] -->
-	
-		<!-- <footer> -->
-			<!-- <span>	
-				<a href="[D[URL_BASE]D]">
-					[D[URL_BASE]D]
-				</a>
-			</span> -->
-			
-			<!-- <span>[T[hello]T] [T[php]T]</span> -->
-			<!-- <hr> -->
-			<!-- <?php echo $data; ?>  -->
-		<!-- </footer> -->
 	</body>
 </html>
