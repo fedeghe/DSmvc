@@ -24,6 +24,13 @@ li{
 	text-align:center;
 	display:none;
 }
+
+.li1{ color:#117711;}
+.li2{ color:#771111;}
+.li3{ color:#111177;}
+.li4{ color:#117777;}
+.li5{ color:#777711;}
+.li6{ color:#771177;}
 .title{
 	color:red;
 	text-align: center;
