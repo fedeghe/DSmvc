@@ -1,6 +1,7 @@
 <?php
 
 require_once(realpath(dirname(__FILE__).'/../core/config/bootstrap.php'));
+require_once(realpath(dirname(__FILE__).'/../app/csp.php'));
 // handle request and dispatch it to the appropriate controller
 try{
 	Dispatcher::dispatch();
