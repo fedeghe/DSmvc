@@ -25,12 +25,12 @@ li{
 	display:none;
 }
 
-.li1{ color:#117711;}
-.li2{ color:#771111;}
-.li3{ color:#111177;}
-.li4{ color:#117777;}
-.li5{ color:#777711;}
-.li6{ color:#771177;}
+.li1{ color:#00FF00;}
+.li2{ color:#FF0000;}
+.li3{ color:#0000FF;}
+.li4{ color:#00FFFF;}
+.li5{ color:#FFFF00;}
+.li6{ color:#FF00FF;}
 .title{
 	color:red;
 	text-align: center;
