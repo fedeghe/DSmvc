@@ -16,8 +16,8 @@ class index extends Controller{
         );
 
         // only if the trial db is set
-        // $places = Places::getAll();
-        // $v->data = utility::print_d($places, true);
+        $places = Places::getAll();
+        $v->data = utility::print_d($places, true);
 
         Response::send($v->display());
     }

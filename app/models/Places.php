@@ -4,11 +4,8 @@ class Places {
 		$db = mydb::getInstance();
         if(!$db) return Array();
 		$res = $db->query("
-			SELECT ? FROM `?`
-		", array(
-            '*',
-            'hs'
-        ),true, false);
+			SELECT * FROM `hs`
+		");
         // return json_encode($db->fetch_all_assoc($res));
         return $db->fetch_all_assoc($res);
 	}
