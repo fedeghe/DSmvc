@@ -1,5 +1,5 @@
 {
-    "name": "your-vendor/dsmvc",
+    "name": "fedeghe/dsmvc",
     "description": "DSMVC lightweight PHP framework",
     "type": "project",
     "license": "MIT",
