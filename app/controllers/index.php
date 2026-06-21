@@ -22,20 +22,6 @@ class index extends Controller{
 
         Response::send($v->display());
     }
-
-
-    public function action_prova(){
-        $x = new View('head');
-        $x->title="prova";
-
-        $v = new View('default');
-
-        $v->head = $x->display();
-
-        if($this->nome!='')$v->nome = $this->nome;
-
-        Response::send($v->display());
-    }
     
     public function after_index(){
         // Response::send(__FILE__.' - method<br />');
