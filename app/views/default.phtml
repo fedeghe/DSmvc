@@ -1,11 +1,3 @@
-<?php
-	$n = 27;
-	$liClasses = 6;
-	$out = '';
-	for ($i = 0; $i < $n; $i++) {
-		$out .= '<li class="li' . rand(1, $liClasses) . '">&bull;</li>';
-	}
-?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -13,8 +5,7 @@
 	</head>
 	<body>
 		<div id="item">
-            <ul><?php echo $out; ?></ul>
+            <ul></ul>
         </div>
-		<!-- <div><?php echo $data; ?></div> -->
 	</body>
 </html>

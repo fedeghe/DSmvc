@@ -13,24 +13,22 @@ var Sphere =  function (size){
     
     
     this.pointsArray = new Array();
-    
-
 	
-	//Create a 3d point for every point on the cube.
-	
-	var tmp = [-size, 0, size];
-	var i = 0;
-	for(var x in tmp)
-		for(var y in tmp)
-			for(var z in tmp){
+	var tmp = [-size, 0, size],
+		i = 0,
+		x, y, z,
+		theta, fi;
+	for(x in tmp)
+		for(y in tmp)
+			for(z in tmp){
 				i++;
-				//this.pointsArray.push(this.make3DPoint(tmp[x],tmp[y],tmp[z]));
-				var theta = g(Math.random() * 360);
-				var fi = g(Math.random() * 360);
-				var x = parseInt(size*Math.cos(theta)*Math.sin(fi),10);
-				var y = parseInt(size*Math.cos(theta)*Math.cos(fi),10);
-				var z = parseInt(size*Math.sin(theta),10);
-				this.pointsArray.push(this.make3DPoint(x,y,z));
+				theta = g(Math.random() * 360);
+				fi = g(Math.random() * 360);
+				this.pointsArray.push(this.make3DPoint(
+					parseInt(size*Math.cos(theta)*Math.sin(fi),10),
+					parseInt(size*Math.cos(theta)*Math.cos(fi),10),
+					parseInt(size*Math.sin(theta),10)
+				));
 			}
 	
 	
@@ -38,4 +36,4 @@ var Sphere =  function (size){
 };
 
 //Inherit DisplayObject3d methods and properties
-Sphere.prototype = new DisplayObject3D();
+Sphere.prototype = new ddd.DisplayObject3D();

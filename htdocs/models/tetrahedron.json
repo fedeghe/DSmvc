@@ -1,0 +1,14 @@
+{
+    "vertices": [
+        [ 94.280,   0.000, -33.333],
+        [-47.140,  81.650, -33.333],
+        [-47.140, -81.650, -33.333],
+        [  0.000,   0.000, 100.000]
+    ],
+    "faces": [
+        {"indices": [0, 2, 1], "color": "#00FF00", "wireframe": true, "cull": true},
+        {"indices": [0, 1, 3], "color": "#FF0000", "wireframe": true, "cull": true},
+        {"indices": [0, 3, 2], "color": "#0000FF", "wireframe": true, "cull": true},
+        {"indices": [1, 2, 3], "color": "#FFFF00", "wireframe": true, "cull": true}
+    ]
+}

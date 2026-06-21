@@ -19,6 +19,13 @@ body{
 	font-size:1em;
 	padding:0px;
 	margin:0px;
+	display:flex;
+	align-items: center;
+	justify-content: center;
+	min-height:100vh;
+}
+canvas {
+	display:flex
 }
 li{
 	text-align:center;

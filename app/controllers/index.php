@@ -8,7 +8,8 @@ class index extends Controller{
         $Person = new Person('Federico', 'Ghedina');
         $x->title = "DSmvc ~ " . $Person->sayHello();
 
-        $v = DSMVC::getView('default');
+        // $v = DSMVC::getView('default');
+        $v = DSMVC::getView('canvas');
         $v->head = $x->display();
 
         $_SESSION['user'] = array(

@@ -46,4 +46,4 @@ var Cube =  function (size){
 };
 
 //Inherit DisplayObject3d methods and properties
-Cube.prototype = new DisplayObject3D();
+Cube.prototype = new ddd.DisplayObject3D();

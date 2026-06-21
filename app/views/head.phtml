@@ -1,35 +1,98 @@
 <meta charset="UTF-8">
 <title>[$title$]</title>
 {C{css/style.css}C}
-{J{js/jquery-1.4.2.min.js}J}
-<script>JMVCshut = true;</script>
-{J{js/3dEngine.js}J}
+<!-- <script>JMVCshut = true;</script> -->
+{J{js/ddd.js}J}
 {J{js/objs/sphere.js}J}
-{J{js/objs/cube.js}J}
+{J{js/canvas3d.js}J}
+{J{js/objs/csphere.js}J}
+{J{js/objs/cdsMvc.js}J}
+{J{js/stl-loader.js}J}
+<!-- {J{js/objs/cube.js}J} -->
+
 
 <script>
-	jQuery(
-		function() {
-			var camera = new Camera3D(),
-				item = new Object3D($("#item")),
-				scene = new Scene3D();
+	document.addEventListener('DOMContentLoaded', function() {
+		var canvas = document.getElementById('canvas3d');
+		if (canvas) {
+			// canvas mode
+			var camera = new canvas3d.Camera3D(),
+				item = new canvas3d.Object3D(canvas),
+				scene = new canvas3d.Scene3D(canvas);
 
-			item.addChild(new Sphere(200));
+			// Esempio: carica modello da JSON
+			fetch('/models/tetrahedron.json').then(r=>r.json()).then(data=>{
+			    var loader = new canvas3d.ModelLoader();
+			    item.addChild(loader.load(data));
+			});
+
+			// Esempio: carica modello STL (saponetta)
+			// var stlLoader = new STLLoader({color: '#FFDAB9', scale: 4});
+			// stlLoader.load('/models/soap.stl', function(model) {
+			//     item.addChild(model);
+			// });
+
+			// scegli oggetto da renderizzare
+			// item.addChild(new cSphere(200));
+			// item.addChild(new cdsMvc(1));
 			camera.init(0,0,0,280);
 			scene.addToScene(item);
-			
-			var animateIt = function(){
-				axisRotation.y += .01;
-				axisRotation.x += .002;
-				axisRotation.z += .02;
+			scene.enableInteraction(camera);
 
+			var animateIt = function(){
+				canvas3d.axisRotation.y += .01;
+				canvas3d.axisRotation.x += .002;
+				canvas3d.axisRotation.z += .02;
+				scene.renderCamera(camera);
+			};
+
+			setInterval(animateIt, 20);
+		} else {
+			// DOM mode
+			var camera = new ddd.Camera3D(),
+				item = new ddd.Object3D(document.getElementById("item")),
+				scene = new ddd.Scene3D();
+
+			item.addChild(new Sphere(200));
+
+			var ul = document.getElementById('item').querySelector('ul');
+			if (ul) {
+				var liClasses = 6;
+				var pointsCount = item.objects[0].pointsArray.length;
+				var html = '';
+				for (var j = 0; j < pointsCount; j++) {
+					html += '<li class="li' + (Math.floor(Math.random() * liClasses) + 1) + '">&bull;</li>';
+				}
+				ul.innerHTML = html;
+			}
+
+			camera.init(0,0,0,280);
+			scene.addToScene(item);
+
+			var animateIt = function(){
+				ddd.axisRotation.y += .01;
+				ddd.axisRotation.x += .002;
+				ddd.axisRotation.z += .02;
 				scene.renderCamera(camera);
 			};
 
 			setInterval(animateIt, 20);
 
-			jQuery('li').fadeIn();
+			var lis = document.getElementsByTagName('li');
+			for (var i = 0; i < lis.length; i++) {
+				(function(li) {
+					li.style.display = 'list-item';
+					var start = Date.now();
+					var dur = 400;
+					function step() {
+						var p = (Date.now() - start) / dur;
+						if (p > 1) p = 1;
+						li.style.opacity = p;
+						if (p < 1) setTimeout(step, 16);
+					}
+					step();
+				})(lis[i]);
+			}
 		}
-	);
-
+	});
 </script>
