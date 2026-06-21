@@ -21,7 +21,7 @@
 				scene = new canvas3d.Scene3D(canvas);
 
 			// Esempio: carica modello da JSON
-			fetch('/models/tetrahedron.json').then(r=>r.json()).then(data=>{
+			fetch('/models/cube.json').then(r=>r.json()).then(data=>{
 			    var loader = new canvas3d.ModelLoader();
 			    item.addChild(loader.load(data));
 			});

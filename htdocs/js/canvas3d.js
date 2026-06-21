@@ -166,7 +166,7 @@ var canvas3d = (function() {
                     ctx.globalAlpha = 1;
 
                     if (poly.wireframe) {
-                        ctx.strokeStyle = '#000';
+                        ctx.strokeStyle = '#AAAAAA';
                         ctx.lineWidth = 1.2;
                         ctx.stroke();
                     }
