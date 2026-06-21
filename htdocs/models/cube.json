@@ -1,23 +1,21 @@
 {
     "vertices": [
-        [ 100, 100, 100],  
-        [ 100, 100, -100], 
-        [ 100, -100, -100], 
-        [ 100, -100, 100], 
-        [ -100, -100, 100], 
-        [ -100, -100, -100], 
-        [ -100, 100, -100], 
-        [ -100, 100, 100]
-
-
+        [ 75, 150, 20],  
+        [ 75, 150, -20], 
+        [ 75, -150, -20], 
+        [ 75, -150, 20], 
+        [ -75, -150, 20], 
+        [ -75, -150, -20], 
+        [ -75, 150, -20], 
+        [ -75, 150, 20]
     ],
     "faces": [
-        {"indices": [0, 1, 2, 3], "color": "#00FF0055", "wireframe": true, "cull": true},
-        {"indices": [2, 5, 4, 3], "color": "#FFFF0055", "wireframe": true, "cull": true},
-        {"indices": [4, 5, 6, 7], "color": "#00FFFF55", "wireframe": true, "cull": true},
-        {"indices": [7, 6, 1, 0], "color": "#FF00FF55", "wireframe": true, "cull": true},
-        {"indices": [4,7,0,3], "color": "#ffffff55", "wireframe": true, "cull": true},
-        {"indices": [2,1,6,5], "color": "#00000055", "wireframe": true, "cull": true}
+        {"indices": [0, 1, 2, 3], "color": "#00FF00", "wireframe": false, "cull": true},
+        {"indices": [2, 5, 4, 3], "color": "#FF0000", "wireframe": false, "cull": true},
+        {"indices": [4, 5, 6, 7], "color": "#0000FF", "wireframe": false, "cull": true},
+        {"indices": [7, 6, 1, 0], "color": "#FFFF00", "wireframe": false, "cull": true},
+        {"indices": [4, 7, 0, 3], "color": "#ffffff33", "wireframe": false, "cull": true},
+        {"indices": [1, 6, 5, 2], "color": "#00000033", "wireframe": false, "cull": true}
         
 
     ]

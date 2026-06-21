@@ -13,7 +13,8 @@
 
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
-		var canvas = document.getElementById('canvas3d');
+		var canvas = document.getElementById('canvas3d'),
+			autoAnimate = true;
 		if (canvas) {
 			// canvas mode
 			var camera = new canvas3d.Camera3D(),
@@ -40,9 +41,11 @@
 			scene.enableInteraction(camera);
 
 			var animateIt = function(){
-				canvas3d.axisRotation.y += .01;
-				canvas3d.axisRotation.x += .002;
-				canvas3d.axisRotation.z += .02;
+				if(autoAnimate) {
+					canvas3d.axisRotation.y += .01;
+					canvas3d.axisRotation.x += .002;
+					canvas3d.axisRotation.z += .02;
+				}				
 				scene.renderCamera(camera);
 			};
 
@@ -70,9 +73,11 @@
 			scene.addToScene(item);
 
 			var animateIt = function(){
-				ddd.axisRotation.y += .01;
-				ddd.axisRotation.x += .002;
-				ddd.axisRotation.z += .02;
+				if (autoAnimate) {
+					ddd.axisRotation.y += .01;
+					ddd.axisRotation.x += .002;
+					ddd.axisRotation.z += .02;
+				}
 				scene.renderCamera(camera);
 			};
 

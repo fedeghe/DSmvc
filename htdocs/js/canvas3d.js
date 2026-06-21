@@ -226,7 +226,7 @@ var canvas3d = (function() {
             var dy = e.clientY - lastY;
             lastX = e.clientX;
             lastY = e.clientY;
-            axisRotation.y += dx * sens;
+            axisRotation.y += -dx * sens;
             axisRotation.x += dy * sens;
             e.preventDefault();
         });
