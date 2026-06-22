@@ -55,29 +55,20 @@ var canvas3d = (function() {
 
     Scene3D.prototype.Transform3DPointsTo2DPoints = function(points, axisRotations, camera) {
         var TransformedPointsArray = [],
-            sx = Math.sin(axisRotations.x),
-            cx = Math.cos(axisRotations.x),
-            sy = Math.sin(axisRotations.y),
-            cy = Math.cos(axisRotations.y),
-            sz = Math.sin(axisRotations.z),
-            cz = Math.cos(axisRotations.z),
-            x, y, z, xy, xz, yx, yz, zx, zy, scaleFactor,
+            m = rotationMatrix,
+            x, y, z, xr, yr, zr, scaleFactor,
             i = points.length;
         while (i--) {
             x = points[i].x;
             y = points[i].y;
             z = points[i].z;
-            xy = cx * y - sx * z;
-            xz = sx * y + cx * z;
-            yz = cy * xz - sy * x;
-            yx = sy * xz + cy * x;
-            zx = cz * yx - sz * xy;
-            zy = sz * yx + cz * xy;
-            scaleFactor = camera.focalLength / (camera.focalLength + yz);
-            x = zx * scaleFactor;
-            y = zy * scaleFactor;
-            z = yz;
-            TransformedPointsArray[i] = this.make2DPoint(x, y, -z, scaleFactor);
+            xr = m[0]*x + m[1]*y + m[2]*z;
+            yr = m[3]*x + m[4]*y + m[5]*z;
+            zr = m[6]*x + m[7]*y + m[8]*z;
+            scaleFactor = camera.focalLength / (camera.focalLength + zr);
+            x = xr * scaleFactor;
+            y = yr * scaleFactor;
+            TransformedPointsArray[i] = this.make2DPoint(x, y, -zr, scaleFactor);
         }
         return TransformedPointsArray;
     };
@@ -85,6 +76,29 @@ var canvas3d = (function() {
     function cross2D(ax, ay, bx, by) {
         return ax * by - ay * bx;
     }
+
+    function multiplyMatrices(a, b) {
+        return [
+            a[0]*b[0] + a[1]*b[3] + a[2]*b[6], a[0]*b[1] + a[1]*b[4] + a[2]*b[7], a[0]*b[2] + a[1]*b[5] + a[2]*b[8],
+            a[3]*b[0] + a[4]*b[3] + a[5]*b[6], a[3]*b[1] + a[4]*b[4] + a[5]*b[7], a[3]*b[2] + a[4]*b[5] + a[5]*b[8],
+            a[6]*b[0] + a[7]*b[3] + a[8]*b[6], a[6]*b[1] + a[7]*b[4] + a[8]*b[7], a[6]*b[2] + a[7]*b[5] + a[8]*b[8]
+        ];
+    }
+
+    function applyRotationAxis(ax, ay, az, angle) {
+        var len = Math.sqrt(ax*ax + ay*ay + az*az);
+        if (len === 0) return;
+        ax /= len; ay /= len; az /= len;
+        var c = Math.cos(angle), s = Math.sin(angle), t = 1 - c;
+        var rot = [
+            t*ax*ax + c,     t*ax*ay - s*az,  t*ax*az + s*ay,
+            t*ax*ay + s*az,  t*ay*ay + c,     t*ay*az - s*ax,
+            t*ax*az - s*ay,  t*ay*az + s*ax,  t*az*az + c
+        ];
+        rotationMatrix = multiplyMatrices(rot, rotationMatrix);
+    }
+
+    var rotationMatrix = [1,0,0, 0,1,0, 0,0,1];
 
     Scene3D.prototype.make2DPoint = function(x, y, depth, scaleFactor) {
         return {'x': x, 'y': y, 'depth': depth, 'scaleFactor': scaleFactor};
@@ -104,7 +118,7 @@ var canvas3d = (function() {
             var screenPts = this.Transform3DPointsTo2DPoints(source, axisRotation, camera);
 
             if (obj.faces && obj.faces.length) {
-                var polygons = [];
+                var drawList = [];
 
                 for (var f = 0; f < obj.faces.length; f++) {
                     var face = obj.faces[f];
@@ -137,7 +151,8 @@ var canvas3d = (function() {
                         });
                     }
 
-                    polygons.push({
+                    drawList.push({
+                        type: 'face',
                         depth: avgDepth,
                         verts: projVerts,
                         color: face.color || '#00FF00',
@@ -145,30 +160,73 @@ var canvas3d = (function() {
                     });
                 }
 
-                polygons.sort(function(a, b) {
+                if (obj.showAxes) {
+                    var axisLen = obj.axisLength || 200;
+                    var segCount = obj.axisSegments || 40;
+                    var axesDirs = [[1,0,0], [0,1,0], [0,0,1]];
+                    var allAxisPts = [];
+                    for (var a = 0; a < axesDirs.length; a++) {
+                        var dir = axesDirs[a];
+                        for (var s = 0; s <= segCount; s++) {
+                            var t = -axisLen + (2 * axisLen * s / segCount);
+                            allAxisPts.push(obj.make3DPoint(dir[0]*t, dir[1]*t, dir[2]*t));
+                        }
+                    }
+                    var axisScreenPts = this.Transform3DPointsTo2DPoints(allAxisPts, axisRotation, camera);
+                    var idxOff = 0;
+                    for (var a = 0; a < axesDirs.length; a++) {
+                        for (var s = 0; s < segCount; s++) {
+                            var ap1 = axisScreenPts[idxOff + s];
+                            var ap2 = axisScreenPts[idxOff + s + 1];
+                            var avgD = (ap1.depth + ap2.depth) / 2;
+                            drawList.push({
+                                type: 'axis',
+                                depth: avgD,
+                                x1: ap1.x + width / 2,
+                                y1: ap1.y + height / 2,
+                                x2: ap2.x + width / 2,
+                                y2: ap2.y + height / 2
+                            });
+                        }
+                        idxOff += segCount + 1;
+                    }
+                }
+
+                drawList.sort(function(a, b) {
                     return a.depth - b.depth;
                 });
 
-                for (var p = 0; p < polygons.length; p++) {
-                    var poly = polygons[p];
-                    var verts = poly.verts;
+                for (var d = 0; d < drawList.length; d++) {
+                    var item = drawList[d];
+                    if (item.type === 'face') {
+                        var verts = item.verts;
 
-                    ctx.beginPath();
-                    ctx.moveTo(verts[0].x, verts[0].y);
-                    for (var v = 1; v < verts.length; v++) {
-                        ctx.lineTo(verts[v].x, verts[v].y);
-                    }
-                    ctx.closePath();
+                        ctx.beginPath();
+                        ctx.moveTo(verts[0].x, verts[0].y);
+                        for (var v = 1; v < verts.length; v++) {
+                            ctx.lineTo(verts[v].x, verts[v].y);
+                        }
+                        ctx.closePath();
 
-                    ctx.fillStyle = poly.color;
-                    ctx.globalAlpha = 0.85;
-                    ctx.fill();
-                    ctx.globalAlpha = 1;
+                        ctx.fillStyle = item.color;
+                        ctx.globalAlpha = 0.85;
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
 
-                    if (poly.wireframe) {
-                        ctx.strokeStyle = '#AAAAAA';
-                        ctx.lineWidth = 1.2;
+                        if (item.wireframe) {
+                            ctx.strokeStyle = '#AAAAAA';
+                            ctx.lineWidth = 1.2;
+                            ctx.stroke();
+                        }
+                    } else if (item.type === 'axis') {
+                        ctx.beginPath();
+                        ctx.moveTo(item.x1, item.y1);
+                        ctx.lineTo(item.x2, item.y2);
+                        ctx.strokeStyle = '#FFFFFF';
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([4, 4]);
                         ctx.stroke();
+                        ctx.setLineDash([]);
                     }
                 }
             } else if (obj.pointsArray && obj.pointsArray.length) {
@@ -226,8 +284,16 @@ var canvas3d = (function() {
             var dy = e.clientY - lastY;
             lastX = e.clientX;
             lastY = e.clientY;
-            axisRotation.y += -dx * sens;
-            axisRotation.x += dy * sens;
+
+            var angleX = dy * sens;
+            var angleY = -dx * sens;
+            var cx = Math.cos(angleX), sx = Math.sin(angleX);
+            var cy = Math.cos(angleY), sy = Math.sin(angleY);
+            var rotX = [1,0,0, 0,cx,-sx, 0,sx,cx];
+            var rotY = [cy,0,sy, 0,1,0, -sy,0,cy];
+            var rot = multiplyMatrices(rotY, rotX);
+            rotationMatrix = multiplyMatrices(rot, rotationMatrix);
+
             e.preventDefault();
         });
 
@@ -261,8 +327,16 @@ var canvas3d = (function() {
             var dy = e.touches[0].clientY - lastY;
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
-            axisRotation.y += dx * sens;
-            axisRotation.x += dy * sens;
+
+            var angleX = dy * sens;
+            var angleY = dx * sens;
+            var cx = Math.cos(angleX), sx = Math.sin(angleX);
+            var cy = Math.cos(angleY), sy = Math.sin(angleY);
+            var rotX = [1,0,0, 0,cx,-sx, 0,sx,cx];
+            var rotY = [cy,0,sy, 0,1,0, -sy,0,cy];
+            var rot = multiplyMatrices(rotY, rotX);
+            rotationMatrix = multiplyMatrices(rot, rotationMatrix);
+
             e.preventDefault();
         }, {passive: false});
 
@@ -352,12 +426,24 @@ var canvas3d = (function() {
 
     var axisRotation = new DisplayObject3D().make3DPoint(0, 0, 0);
 
+    function applyRotation(axis, angle) {
+        var c = Math.cos(angle), s = Math.sin(angle);
+        var rot;
+        if (axis === 'x') rot = [1,0,0, 0,c,-s, 0,s,c];
+        else if (axis === 'y') rot = [c,0,s, 0,1,0, -s,0,c];
+        else if (axis === 'z') rot = [c,-s,0, s,c,0, 0,0,1];
+        else return;
+        rotationMatrix = multiplyMatrices(rot, rotationMatrix);
+    }
+
     return {
         DisplayObject3D: DisplayObject3D,
         Camera3D: Camera3D,
         Object3D: Object3D,
         Scene3D: Scene3D,
         ModelLoader: ModelLoader,
-        axisRotation: axisRotation
+        axisRotation: axisRotation,
+        applyRotation: applyRotation,
+        applyRotationAxis: applyRotationAxis
     };
 })();

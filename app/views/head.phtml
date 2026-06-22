@@ -23,8 +23,10 @@
 
 			// Esempio: carica modello da JSON
 			fetch('/models/cube.json').then(r=>r.json()).then(data=>{
-			    var loader = new canvas3d.ModelLoader();
-			    item.addChild(loader.load(data));
+			    var loader = new canvas3d.ModelLoader(),
+					model = loader.load(data);
+				// model.showAxes = true; 
+			    item.addChild(model);
 			});
 
 			// Esempio: carica modello STL (saponetta)
@@ -40,12 +42,15 @@
 			scene.addToScene(item);
 			scene.enableInteraction(camera);
 
+			var randomAxis = {
+				x: Math.random() - 0.5,
+				y: Math.random() - 0.5,
+				z: Math.random() - 0.5
+			};
 			var animateIt = function(){
 				if(autoAnimate) {
-					canvas3d.axisRotation.y += .01;
-					canvas3d.axisRotation.x += .002;
-					canvas3d.axisRotation.z += .02;
-				}				
+					canvas3d.applyRotationAxis(randomAxis.x, randomAxis.y, randomAxis.z, 0.02);
+				}
 				scene.renderCamera(camera);
 			};
 
