@@ -36,6 +36,26 @@ class db{
 			// ,$c['port']
 		);
 		@mysqli_select_db($this->db, $c['db']);
+		@mysqli_set_charset($this->db, 'utf8mb4');
+		$this->ensureUtf8mb4();
+	}
+
+	protected function ensureUtf8mb4() {
+		$db = $this->db;
+		$res = @mysqli_query($db, "SELECT DEFAULT_CHARACTER_SET_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = DATABASE()");
+		if ($res) {
+			$row = @mysqli_fetch_assoc($res);
+			if ($row && $row['DEFAULT_CHARACTER_SET_NAME'] === 'utf8mb4') {
+				return;
+			}
+		}
+		@mysqli_query($db, 'ALTER DATABASE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+		$tablesRes = @mysqli_query($db, "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'");
+		if ($tablesRes) {
+			while ($t = @mysqli_fetch_assoc($tablesRes)) {
+				@mysqli_query($db, "ALTER TABLE `".$t['TABLE_NAME']."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+			}
+		}
 	}
 
 	protected function disconnect(){
