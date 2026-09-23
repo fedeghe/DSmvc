@@ -5,7 +5,7 @@ class index extends Controller{
     public function action_index($params){
         
         $x = DSMVC::getView('head');
-        $Person = new Person('Federico', 'Ghedina');
+        $Person = new Person('Damn', 'Small', 'MVC');
         $x->title = "DSmvc ~ " . $Person->sayHello();
 
         // $v = DSMVC::getView('default');
