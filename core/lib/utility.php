@@ -162,6 +162,24 @@ class utility{
 	}
 
 	/**
+	 * HTML-escape a value for safe output in templates
+	 */
+	public static function h($str){
+		return htmlspecialchars((string)$str, ENT_QUOTES, 'UTF-8');
+	}
+
+	/**
+	 * Build an associative array from result rows, indexed by $key, valued by $val
+	 */
+	public static function array_makeassoc($rows, $key, $val){
+		$ret = array();
+		foreach ((array)$rows as $row) {
+			$ret[$row[$key]] = $row[$val];
+		}
+		return $ret;
+	}
+
+	/**
 	 * uses tinyurl service to recude a url
 	 *
 	 * @param url $url
@@ -205,7 +223,7 @@ class utility{
 	}
 	
 	public static function validUrl($ret){
-		return preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $url);
+		return preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $ret);
 	}
 	
 	/**
@@ -215,6 +233,7 @@ class utility{
 	 * address format and the domain exists.
 	 */
 	 public static function validEmail($email){
+		 $isValid = true;
 		 $atIndex = strrpos($email, "@");
 		 if (is_bool($atIndex) && !$atIndex) {
 			 return false;

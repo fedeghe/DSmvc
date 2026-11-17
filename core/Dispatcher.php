@@ -3,7 +3,10 @@ class Dispatcher{
 
 	public static function dispatch() {
 		ob_start();
-		
+
+		// security: validate the CSRF token on every POST request
+		CSRF_AUTO_VALIDATE && Csrf::validate();
+
 		// maybe we can jump
 		//
 		CACHE_ACTIVE && Cache::check();
@@ -48,7 +51,7 @@ class Dispatcher{
 				DSMVC::$controller = CONTROLLER404;
 				DSMVC::$action = 'index';
 			} else {
-				die("Controller `$controller.php` not found");
+				die('Requested page not found');
 				// sleep(3);
 				// header('Location:'.URL_BASE);
 			}

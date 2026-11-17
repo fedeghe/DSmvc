@@ -63,7 +63,7 @@ class Parser
             'trans_soft' => array('preg' => '!\[t\[' . $lng . '\]t]!Uis',            'params' => array('pre' => '[t[', 'post' => ']t]')),
 
             'trans'    => array('preg' => '!\[T\[' . $lng . '\]T]!Uis',            'params' => array('pre' => '[T[', 'post' => ']T]')),
-            'php'    => array('preg' => '!\[\[php\s' . $min . '::(.*)\]\]!Uis', 'params' => array('pre' => '[[php ', 'post' => ']]'))
+            'php'    => array('preg' => '!\[\[php\s' . $min . '::([a-zA-Z0-9_]{1,})\s*\(\s*([^()$;]*)\s*\)\s*\]\]!Uis', 'params' => array('pre' => '[[php ', 'post' => ']]'))
         );
     }
 
@@ -159,14 +159,23 @@ class Parser
 
     private function get_php($out, $params)
     {
-        $pre = $params['pre'];
-        $post = $params['post'];
-        //utility::pd($out);
-        //foreach($out[1] as $k => $val)	$this->content = str_replace($pre.$val.$post, isSet($$val)?$$val:'', $this->content);
+        $allowed = is_string(PARSER_PHP_ALLOWED) ? unserialize(PARSER_PHP_ALLOWED) : (array)PARSER_PHP_ALLOWED;
+        if (!is_array($allowed)) {
+            $allowed = array();
+        }
 
         foreach ($out[1] as $k => $val) {
+            // only whitelisted classes may be invoked from templates
+            if (!in_array($val, $allowed, true)) {
+                $this->content = str_replace($out[0][$k], '', $this->content);
+                continue;
+            }
             ob_start();
-            eval($out[1][$k] . '::' . $out[2][$k] . ';');
+            try {
+                eval($out[1][$k] . '::' . $out[2][$k] . '(' . $out[3][$k] . ');');
+            } catch (Throwable $e) {
+                // a failing whitelisted call must not break the page
+            }
             $tmp = ob_get_clean();
             $this->content = str_replace($out[0][$k], $tmp, $this->content);
         }
@@ -310,7 +319,7 @@ class Parser
         foreach ($out[1] as $k => $val)
             $this->content = str_replace(
                 $params['pre'] . $val . $params['post'],
-                isset($_SESSION[$val]) ? $_SESSION[$val] : '',
+                isset($_SESSION[$val]) && is_scalar($_SESSION[$val]) ? utility::h($_SESSION[$val]) : '',
                 $this->content
             );
     }
@@ -321,7 +330,7 @@ class Parser
         foreach ($out[1] as $k => $val)
             $this->content = str_replace(
                 $params['pre'] . $val . $params['post'],
-                isset($_GET[$val]) ? $_GET[$val] : '',
+                isset($_GET[$val]) && is_scalar($_GET[$val]) ? utility::h($_GET[$val]) : '',
                 $this->content
             );
     }
@@ -335,7 +344,7 @@ class Parser
         foreach ($out[1] as $k => $val)
             $this->content = str_replace(
                 $params['pre'] . $val . $params['post'],
-                isset($_POST[$val]) ? $_POST[$val] : '',
+                isset($_POST[$val]) && is_scalar($_POST[$val]) ? utility::h($_POST[$val]) : '',
                 $this->content
             );
     }
@@ -402,14 +411,14 @@ class Parser
                 // that reduce usage, in fact cannot use in a attribute like a title or a alt
                 $x = ($exists && isset($transL[$label]) && $transL[$label] != $label) ?
                     $transL[$label]
-                    : ($soft ?  $label : '<i class="untranslated" title="not translated">' . $label . '</i>');
+                    : ($soft ?  utility::h($label) : '<i class="untranslated" title="not translated">' . utility::h($label) . '</i>');
             } else {
 
                 // debug($trans);
                 // same here
                 $x = (isset($trans[$label]) && $trans[$label] != $label) ?
                     $trans[$label]
-                    : ($soft ? $label : '<i class="untranslated" title="not translated">' . $label . '</i>');
+                    : ($soft ? utility::h($label) : '<i class="untranslated" title="not translated">' . utility::h($label) . '</i>');
             }
 
             // replace

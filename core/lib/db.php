@@ -246,12 +246,10 @@ class db{
 	* SOLO SE LE TABELLE COINVOLTE SONO INNOdb !!!!!
 	*/
 	public function sql_array_transaction($queries) {
-		$db = db::get_instance();
 		$this->query('SET autocommit=0;');
 		$this->query('START TRANSACTION;');
 		//flag riuscita
 		$ret= TRUE;
-		$log  = Factory::get('log');
 
 		foreach ($queries as $q) {
 			if ($ret) {
@@ -259,6 +257,8 @@ class db{
 			}
 		}
 		$this->query( ($ret!=FALSE)? 'COMMIT; ':'ROLLBACK; ');
+		// restore the session default: autocommit=0 persists on the connection
+		$this->query('SET autocommit=1;');
 		return $ret;
 	}
 

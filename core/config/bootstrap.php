@@ -12,6 +12,13 @@ date_default_timezone_set(date_default_timezone_get());
 
 // print_r($_GET, true);
 
+// harden session cookie before starting the session
+session_set_cookie_params(array(
+    'lifetime' => 0,
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'secure'   => array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] === 'on'
+));
 session_start();
 $REQUEST_URI = $_SERVER['REQUEST_URI'];
 $SERVER_NAME = $_SERVER['SERVER_NAME'];
@@ -53,7 +60,7 @@ function deep_slashes($value) {
         case is_object($value) :
             $vars = get_object_vars( $value );
             foreach ($vars as $key=>$data) {
-                $value->{$key} = stripslashes_deep( $data );
+                $value->{$key} = deep_slashes( $data );
             }
         break;
         default:
@@ -62,8 +69,23 @@ function deep_slashes($value) {
     }
     return $value;
 }
-function strip_defined_ph($value) { 
-    return preg_replace('!\[D\[([a-zA-Z0-9_\-]{1,})\]D\]!Uis', '', $value); 
+/*
+ * Deep clean for POST, GET, COOKIE, REQUEST: remove any parser marker
+ * so user-supplied values can never become interpretable template markup
+ * ([D[]D], [S[]S], [P[]P], [G[]G], [V[]V], [[...]], {{...}}, {J{}J}, {C{}C}, [T[]T], [t[]t])
+ */
+function strip_defined_ph($value) {
+    return preg_replace(
+        array(
+            '!\[(?:D|S|P|G|V)\[[^\[\]]*\](?:D|S|P|G|V)\]!Uis',
+            '!\[(?:T|t)\[[^\[\]]*\](?:T|t)\]!Uis',
+            '!\[\[[^\[\]]*\]\]!Uis',
+            '!\{\{[^{}]*\}\}!Uis',
+            '!\{[JC]\{[^{}]*\}[JC]\}!Uis'
+        ),
+        '',
+        $value
+    );
 }
 
 if ( !function_exists('get_magic_quotes_gpc') ) {
@@ -79,7 +101,7 @@ $_GET       = array_map( 'strip_defined_ph', $_GET );
 $_COOKIE    = array_map( 'strip_defined_ph', $_COOKIE );
 $_REQUEST   = array_map( 'strip_defined_ph', $_REQUEST );
 
-if (preg_match('/^http:\/\/localhost/', URL_ROOT) && !!ON_DOMAIN) {
+if (preg_match('#^https?://localhost#', URL_ROOT) && !!ON_DOMAIN) {
     die('IT seems like ON_DOMAIN parameter should be set to TRUE in '. __FILE__);
 }
 if (!preg_match('/^http:\/\/localhost/', URL_ROOT) && !ON_DOMAIN) {
@@ -88,6 +110,7 @@ if (!preg_match('/^http:\/\/localhost/', URL_ROOT) && !ON_DOMAIN) {
 
 if (!ONLINE) {
     header("Location:/offline.php");
+    exit;
 }
 
 
