@@ -19,7 +19,7 @@ class Response{
 
     public static function getContent() {
         if (self::$id) {
-            Cache::set(md5(URL), self::$content);
+            Cache::set(self::$id, self::$content);
         }
         return self::$content;
     }

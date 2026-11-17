@@ -17,6 +17,7 @@ class Controller{
 		$controller = $bt[1]['class'];
 		// echo '<u><b>'.$name.'</b></u> action <b>NOT FOUND</b> in '.__CLASS__.' <b>'.$controller.'</b>';
 		header('Location:'.URL_BASE);
+		exit;
 
 	}
 

@@ -73,7 +73,7 @@ class index extends Controller {
     public function action_index($params, $url) {
         // $params = key/value array from URL+GET; also available as $this->key ("first-assignment-wins")
         // Request::ajaxCheck();   // die() unless called via XMLHttpRequest (AJAX-only endpoints)
-        // Csrf::validate();      // MANDATORY here for POST handlers (mismatch → 403)
+        //Csrf::validate();      // automatic on every POST (CSRF_AUTO_VALIDATE); call manually only to re-check
         Response::send($html);   // the ONLY output path for HTML
     }
 }
@@ -100,11 +100,11 @@ Markers (resolved recursively, also nested inside chunks):
 |---|---|
 | `[$var$]` | view property |
 | `[D[CONST]D]` | PHP constant |
-| `[S[x]S]` / `[P[x]P]` / `[G[x]G]` | `$_SESSION` / `$_POST` / `$_GET` |
+| `[S[x]S]` / `[P[x]P]` / `[G[x]G]` | `$_SESSION` / `$_POST` / `$_GET` (HTML-escaped on output via `utility::h()`) |
 | `{{name}}` | chunk `app/chunks/name.phtml` (fallback `core/lib/chunks/`) |
 | `[[name]]` | snippet `app/snippets/name.php` (also `name/name.php`) |
 | `[[name &par=\`val\`]]` | snippet with parameters → local `$par` variables |
-| `[[php Class::method()]]` | eval of a static call, output captured |
+| `[[php Class::method()]]` | eval of a static call, output captured — only classes in `PARSER_PHP_ALLOWED` (default: none) |
 | `{C{css/x.css}C}` | `<link>` if the file exists (path relative to htdocs) |
 | `{J{js/x.js}J}` | `<script>` if the file exists (path relative to htdocs) |
 | `[V[name]V]` | direct include of `app/views/name.phtml` |
@@ -149,20 +149,25 @@ public function action_api($params) {
 
 ## Security
 
-- **CSRF**: `Csrf::field()` outputs the hidden input in forms; `Csrf::validate()` must be called explicitly in every POST handler. Per-session token (`Csrf::init()` from bootstrap).
+- **CSRF**: validated automatically on every POST request by the Dispatcher (`CSRF_AUTO_VALIDATE=true`). `Csrf::field()` outputs the hidden input in forms; JSON/AJAX endpoints send the token via the `X-CSRF-TOKEN` header. Set `CSRF_AUTO_VALIDATE=false` to opt out and call `Csrf::validate()` manually.
 - **CSP**: headers are sent by `app/csp.php` on every request. Edit there to add CDNs.
-- **XSS**: `utility::make_safe()`; input is already escaped with `mres()` by the bootstrap.
+- **XSS**: input is pre-escaped with `mres()` by the bootstrap — that is **SQL escaping only, NOT HTML escaping**. For safe HTML output use `utility::h()`; for DB values always use prepared statements (`?` placeholders). `utility::make_safe()` is destructive, use only for plain-text fields.
+- **Template injection**: user values cannot contain parser markers (`[D[]D]`, `[S[]S]`, `{{...}}`, `[[...]]`, `[T[]T]`, ...) — the bootstrap strips them from GET/POST/COOKIE. The `[[php Class::method()]]` marker calls only classes in `PARSER_PHP_ALLOWED` (serialized array, empty by default = marker inert).
+- **Lang whitelist**: `?lang` accepts only `[a-zA-Z][a-zA-Z0-9_-]{0,9}` (blocks path traversal); unknown codes still fall back to the previous/default language.
+- **Session**: cookie is `httponly` + `samesite=Lax` + `secure` under HTTPS. In login handlers call `auth::regenerate()` after setting `$_SESSION['user']` (session-fixation defense).
+- **Host header**: define `APP_HOST` (e.g. `'https://mydomain.com'`) to hardcode the public host; otherwise `URL_ROOT`/`FULL_URL` trust `SERVER_NAME`/`HTTP_HOST`.
+- **Errors/leak**: `ERROR_VISIBLE=false` and `STACKTRACE_ENABLED=false` by default (enable in `configs/dev.php` for local debugging); log files are denied in `htdocs/` via `.htaccess`.
 
 ## Helpers
 
-- `utility::*`: `make_safe()` (anti-XSS), `get_combo()` (`<select>` builder), `print_d()` (dump), `validEmail()`, `trace()`, `mem()`.
+- `utility::*`: `h()` (HTML escaping for output), `make_safe()` (destructive cleaner), `get_combo()` (`<select>` builder), `array_makeassoc()` (rows→assoc), `print_d()` (dump), `validEmail()`, `trace()`, `mem()`.
 - `arr::*`: `arr2treearr()` (flat→tree), `arr2attr()`/`assoc2attrib()` (array→HTML attributes), `arr2get()` (→query string), `array_partition()`, `sortArrayByArray()`.
 - `debug($x)` (print_r in `<pre>`), `mres()`, `microtime_float()`.
 - `Factory::get('<class>')` for the singleton pool.
 
 ## Authentication
 
-`core/lib/auth.php` is a stub: `auth::can_enter()` returns `false` (hook point to implement), `auth::gout()` does logout+redirect. Demo user: `$_SESSION['user']`. Expected pattern: check in `before()` and redirect to `/login` (→ `htdocs/login.php`, placeholder to implement). The session is started by the bootstrap.
+`core/lib/auth.php` is a stub: `auth::can_enter()` returns `false` (hook point to implement), `auth::gout()` does logout+redirect, `auth::regenerate()` rotates the session id (call it after setting `$_SESSION['user']` on login). Demo user: `$_SESSION['user']`. Expected pattern: check in `before()` and redirect to `/login` (→ `htdocs/login.php`, placeholder to implement). The session is started by the bootstrap.
 
 ## Cache
 

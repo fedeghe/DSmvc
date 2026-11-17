@@ -6,3 +6,8 @@
 	RewriteRule ^.*$ index.php [PT,L]
 </IfModule>
 
+# deny access to sensitive files in the web root
+<FilesMatch "\.(log|ini|sql|sh|md)$">
+	Require all denied
+</FilesMatch>
+

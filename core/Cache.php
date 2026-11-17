@@ -10,9 +10,16 @@ class Cache{
 
 	private static $ext = '.html';
 
+	// build the cache key from the full URL path and the active language,
+	// so pages for different query strings / languages never share an entry
+	public static function key() {
+		$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : DEFAULT_LANG;
+		return md5(URL . '|' . $lang);
+	}
+
 	public static function check() {
-		
-		$id = md5(URL);
+
+		$id = self::key();
 		if (self::valid($id)) {
 			echo self::get($id);
 			die();
@@ -35,7 +42,7 @@ class Cache{
 		$data = preg_replace("/\s\s+/m", " ", $data);
 		$data = preg_replace("/\t+/m", "", $data);
 
-		if (!file_put_contents($file, serialize($data))) {
+		if (!file_put_contents($file, json_encode($data))) {
 
 			throw new Exception('Error writing data to cache file.');
 		}
@@ -53,7 +60,7 @@ class Cache{
 
 			throw new Exception('Error reading data from cache file.');
 		}
-		return unserialize($data);
+		return json_decode($data, true);
 	}
 	
 	// check if the cache file is valid or not

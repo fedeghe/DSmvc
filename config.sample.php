@@ -12,4 +12,6 @@ defined('APP_NAME') || define('APP_NAME', 'just your app label');
 defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');
 defined('SHRINK_HTML') || define('SHRINK_HTML', true);
 // defined('FAVICON') || define('FAVICON', 'https://yourdomain.com/media/favicon.ico');
+// security: hardcode the public host to prevent Host-header trust
+// defined('APP_HOST') || define('APP_HOST', 'https://yourdomain.com');
 //////// DSMVC

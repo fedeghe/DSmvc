@@ -44,14 +44,15 @@ class Request{
 
 		if (method_exists(self::$_controllerInstance[$controller], 'before_' . $actionName)) {
 
-			call_user_func_array(array(self::$_controllerInstance[$controller], 'before_'.$actionName), $params);
+			// array_values: string keys would become named parameters in PHP8+
+			call_user_func_array(array(self::$_controllerInstance[$controller], 'before_'.$actionName), array_values($params));
 		}
 		
 		//action existance is managed by controller protected __call
 		self::$_controllerInstance[$controller]->$action($params, $url, $controller, $action);
 
 		if (method_exists(self::$_controllerInstance[$controller], 'after_' . $actionName)) {
-			call_user_func_array(array(self::$_controllerInstance[$controller], 'after_'.$actionName), $params);
+			call_user_func_array(array(self::$_controllerInstance[$controller], 'after_'.$actionName), array_values($params));
 		}
 
 		if (method_exists(self::$_controllerInstance[$controller], 'after')) {

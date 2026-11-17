@@ -16,6 +16,19 @@ defined('DEFAULT_ACTION') || define('DEFAULT_ACTION', 'index');
 defined('URL_EXT') || define('URL_EXT', "/\.html|\.php/");
 defined('CONTROLLER404') || define('CONTROLLER404', 'ctrl404');
 
+// security: auto-validate CSRF token on every POST request (Dispatcher).
+// set to false and call Csrf::validate() manually to opt out.
+defined('CSRF_AUTO_VALIDATE') || define('CSRF_AUTO_VALIDATE', true);
+
+// security: classes callable via [[php Class::method()]] template markers.
+// empty list = the marker is inert. Example: define('PARSER_PHP_ALLOWED', serialize(array('Person')));
+defined('PARSER_PHP_ALLOWED') || define('PARSER_PHP_ALLOWED', serialize(array()));
+
+// security: hardcode the public host to avoid Host-header trust.
+// when set it overrides SERVER_NAME/HTTP_HOST in URL_ROOT and FULL_URL.
+// example: defined('APP_HOST') || define('APP_HOST', 'https://mydomain.com');
+defined('APP_HOST') || define('APP_HOST', '');
+
 defined('PATH_ROOT') || define('PATH_ROOT', realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS) . DS);
 defined('PATH_APP') || define('PATH_APP', PATH_ROOT . 'app' . DS);
 defined('PATH_VIEW') || define('PATH_VIEW', PATH_APP . 'views' . DS);
@@ -41,17 +54,21 @@ $defaultPorts = in_array(PORT, array(443, 80));//regardless the protocol
 
 defined('LOCAL_FOLDER') || define('LOCAL_FOLDER', ON_DOMAIN ? '' : basename(dirname(dirname(dirname(__FILE__)))));
 defined('BASE_FOLDER') || define('BASE_FOLDER', ON_DOMAIN ? '' :  LOCAL_FOLDER . US);
-defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $SERVER_NAME . (($defaultPorts) ? '' : ':'.PORT). US);
+defined('URL_ROOT') || define('URL_ROOT', APP_HOST !== ''
+    ? rtrim(APP_HOST, US) . US
+    : PROTOCOL . ':' . US . US . $SERVER_NAME . (($defaultPorts) ? '' : ':'.PORT). US);
 // defined('URL_ROOT') || define('URL_ROOT', PROTOCOL . ':' . US . US . $SERVER_NAME . US);
 defined('URL_BASE') || define('URL_BASE', URL_ROOT . BASE_FOLDER);
 defined('URL_COMPLETE') || define('URL_COMPLETE', $REQUEST_URI);
 defined('URL') || define('URL', parse_url($REQUEST_URI)['path']);
 defined('FULL_URL') ||
     define(
-        'FULL_URL', 
-        "http".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "s": "")."://"
-        .$_SERVER['HTTP_HOST']
-        .(strlen($_SERVER['REQUEST_URI']) > 1 ? $_SERVER['REQUEST_URI'] : '')   
+        'FULL_URL',
+        APP_HOST !== ''
+            ? rtrim(APP_HOST, US) . $_SERVER['REQUEST_URI']
+            : "http".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "s": "")."://"
+            .$_SERVER['HTTP_HOST']
+            .(strlen($_SERVER['REQUEST_URI']) > 1 ? $_SERVER['REQUEST_URI'] : '')
     );
 
 defined('PATH_JS') || define('PATH_JS', PATH_ROOT . 'htdocs' . DS . 'js' . DS);
@@ -62,7 +79,7 @@ defined('PATH_CSS') || define('PATH_CSS', PATH_ROOT . 'htdocs' . DS . 'css' . DS
 defined('CUMULATE_LANG') || define('CUMULATE_LANG', true);
 
 defined('ERROR_LEVEL') || define('ERROR_LEVEL',  2<<13 -1 );
-defined('ERROR_VISIBLE') || define('ERROR_VISIBLE', true);
-defined('STACKTRACE_ENABLED') || define('STACKTRACE_ENABLED', true);
+defined('ERROR_VISIBLE') || define('ERROR_VISIBLE', false);
+defined('STACKTRACE_ENABLED') || define('STACKTRACE_ENABLED', false);
 
 defined('DEFAULT_LANG') || define('DEFAULT_LANG', 'en');
